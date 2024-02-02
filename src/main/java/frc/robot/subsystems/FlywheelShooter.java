@@ -30,7 +30,7 @@ public class FlywheelShooter extends SubsystemBase {
 		topShooter.setSmartCurrentLimit(50, 40);
     topShooter.setInverted(true);
 
-    botShooter = new CANSparkMax(Constants.BOTTOM_SHOOT_ID, MotorType.kBrushless);
+    botShooter = new CANSparkMax(Constants.BOT_SHOOT_ID, MotorType.kBrushless);
     botPIDShoot = botShooter.getPIDController();
 		botPIDShoot.setP(Constants.SHOOT_PID[1][0]);
 		botPIDShoot.setI(Constants.SHOOT_PID[1][1]);

@@ -1,8 +1,28 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax.IdleMode;
+import edu.wpi.first.wpilibj.Timer;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
+import com.revrobotics.CANSparkBase.IdleMode;
+
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -16,15 +36,123 @@ public class GyroSwerveDrive extends SubsystemBase {
   private SlewRateLimiter joystickSlewLimiterY;
   private SlewRateLimiter joystickSlewLimiterZ;
 
+  private SwerveDriveKinematics kinematics;
+  private SwerveDriveOdometry   odometry;
+  private SwerveDrivePoseEstimator poseEstimator;
+  private ADIS16470_IMU gyro;
+
+  public boolean trustVision;
+
   private SwerveModule[] swerveMod = {
     new SwerveModule(0), new SwerveModule(1), new SwerveModule(2), new SwerveModule(3)
   };
 
-  public GyroSwerveDrive(RobotStates robotStates) {
+  public GyroSwerveDrive(RobotStates robotStates, ADIS16470_IMU gyro) {
     m_RobotStates = robotStates;
     joystickSlewLimiterX = new SlewRateLimiter(Constants.JOYSTICK_X_SLEW_RATE);
     joystickSlewLimiterY = new SlewRateLimiter(Constants.JOYSTICK_Y_SLEW_RATE);
     joystickSlewLimiterZ = new SlewRateLimiter(Constants.JOYSTICK_Z_SLEW_RATE);
+    this.gyro = gyro;
+
+    kinematics = new SwerveDriveKinematics(
+      new Translation2d(Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254, Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254),
+       new Translation2d(Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254, -Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254),
+        new Translation2d(-Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254, Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254),
+         new Translation2d(-Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254, -Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254)
+    );
+    odometry = new SwerveDriveOdometry(
+      kinematics,
+       Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis())),
+        getModulePositions()
+    );
+
+    poseEstimator = new SwerveDrivePoseEstimator(
+      kinematics, 
+      Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis())),
+       getModulePositions(),
+        new Pose2d()
+        );
+
+    trustVision = false;
+
+    AutoBuilder.configureHolonomic(
+      this::getPose,
+      this::resetOdometry,
+      this::getSpeeds,
+      this::driveUnits,
+      new HolonomicPathFollowerConfig(
+        new PIDConstants(4.0, 0, 0.05),
+        new PIDConstants(0.1, 0, 0.005),
+        Constants.MAX_DRIVETRAIN_SPEED * Constants.DRIVE_POSITION_CONVERSION / 60.0,
+        0.29,
+        new ReplanningConfig()
+      ),
+      () -> {
+                    // Boolean supplier that controls when the path will be mirrored for the red alliance
+                    // This will flip the path being followed to the red side of the field.
+                    // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+                    var alliance = DriverStation.getAlliance();
+                    if (alliance.isPresent()) {
+                        return alliance.get() != DriverStation.Alliance.Red;
+                    }
+                    return false;
+                },
+                this
+    );
+  }
+
+  //help
+
+  public ChassisSpeeds getSpeeds() {
+    return kinematics.toChassisSpeeds(getModuleState());
+  }
+
+  @Override
+  public void periodic() {
+    poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(1000, 1000, Units.degreesToRadians(20)));
+    poseEstimator.updateWithTime(
+      Timer.getFPGATimestamp(),
+       Rotation2d.fromDegrees(-(gyro.getAngle(gyro.getYawAxis()) % 360.0 - 180.0)),
+        getModulePositions()
+    );
+  }
+
+  public Pose2d getPose(){
+    return poseEstimator.getEstimatedPosition();
+  }
+
+  private SwerveModulePosition[] getModulePositions(){
+    SwerveModulePosition[] positions = new SwerveModulePosition[4];
+    positions[0] = swerveMod[0].getPosition();
+    positions[1] = swerveMod[3].getPosition();
+    positions[2] = swerveMod[1].getPosition();
+    positions[3] = swerveMod[2].getPosition();
+    return positions;
+  }
+
+  public void resetOdometry(Pose2d pose){
+    for (int i = 0; i < 4; i++) {
+      swerveMod[i].resetModule();
+    }
+    poseEstimator.resetPosition(
+      Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis()) % 360.0),
+       getModulePositions(),
+        pose
+    );
+  }
+
+  public void resetGyro(){
+    gyro.reset();
+    poseEstimator.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), getPose());
+  }
+
+  public void updateVisionPoseEstimator(Pose2d visionEstimate, double timestamp, double distance){
+    //ramp measurement trust based on robot distance
+    //poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.1 * Math.pow(15, distance), 0.1 * Math.pow(15, distance), Units.degreesToRadians(20)));
+    //poseEstimator.addVisionMeasurement(visionEstimate, timestamp);
+    SmartDashboard.putNumber("Tag Distance ", distance);
+    SmartDashboard.putNumber("Tag correlation ", 0.1 * Math.pow(15, distance));
   }
 
   private double applyDeadzone(double input, double deadzone) {
@@ -36,12 +164,12 @@ public class GyroSwerveDrive extends SubsystemBase {
   public void alteredGyroDrive(double dX, double dY, double dZ, double gyroAngle){
     dX = -applyDeadzone(dX, Constants.JOYSTICK_X_DEADZONE);
     dY = -applyDeadzone(dY, Constants.JOYSTICK_Y_DEADZONE);
-    dZ = -applyDeadzone(dZ, Constants.JOYSTICK_Z_DEADZONE) * 0.2;
+    dZ = -dZ;
     if ((dX != 0.0) || (dY != 0.0) || (dZ != 0.0)) {
       gyroDrive(
-         joystickSlewLimiterX.calculate(dX * m_RobotStates.driveMultiplier),
-         joystickSlewLimiterY.calculate(dY * m_RobotStates.driveMultiplier),
-         joystickSlewLimiterZ.calculate(dZ),
+         dX * m_RobotStates.driveMultiplier,
+         dY * m_RobotStates.driveMultiplier,
+         dZ,
           gyroAngle
       );
       m_RobotStates.inFrontOfCubeStation = false;
@@ -55,8 +183,9 @@ public class GyroSwerveDrive extends SubsystemBase {
   }
 
   public void gyroDrive(double str, double fwd, double rot, double gyroAngle) {
-    double intermediary = fwd * Math.cos(gyroAngle) + str * Math.sin(gyroAngle);
-    str = -fwd * Math.sin(gyroAngle) + str * Math.cos(gyroAngle);
+    double angle = gyroAngle;//poseEstimator.getEstimatedPosition().getRotation().getRadians();
+    double intermediary = fwd * Math.cos(angle) + str * Math.sin(angle);
+    str = -fwd * Math.sin(angle) + str * Math.cos(angle);
     drive(str, intermediary, rot);
     setSetpoints();
   }
@@ -70,6 +199,31 @@ public class GyroSwerveDrive extends SubsystemBase {
       speed[3] = 0.0;
     }
     setSetpoints();
+  }
+
+  public void driveUnits(ChassisSpeeds driveSpeeds) {
+    //driveSpeeds = ChassisSpeeds.discretize(driveSpeeds, 0.2); 
+    double meterSecToRPM = (1 / Constants.DRIVE_POSITION_CONVERSION * 60.0);
+    double str = driveSpeeds.vyMetersPerSecond * meterSecToRPM / Constants.MAX_DRIVETRAIN_SPEED;
+    double fwd = driveSpeeds.vxMetersPerSecond * meterSecToRPM / Constants.MAX_DRIVETRAIN_SPEED;
+    double rot = driveSpeeds.omegaRadiansPerSecond;
+    str = Math.abs(str) >= 0.005 ? str : 0.0;
+    fwd = Math.abs(fwd) >= 0.005 ? fwd : 0.0;
+    rot = Math.abs(rot) >= 0.01 ? rot : 0.0;
+    drive(str, fwd, rot);
+  }
+
+  public SwerveModuleState[] getModuleState(){
+    SwerveModuleState[] positions = new SwerveModuleState[4];
+    positions[0] = swerveMod[0].getState();
+    positions[1] = swerveMod[3].getState();
+    positions[2] = swerveMod[1].getState();
+    positions[3] = swerveMod[2].getState();
+    return positions;
+  }
+
+  public void drive(double[] inputs) {
+    drive(inputs[0], inputs[1], inputs[2]);
   }
 
   /*

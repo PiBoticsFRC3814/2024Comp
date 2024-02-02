@@ -4,32 +4,31 @@
 
 package frc.robot.commands;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.FlywheelShooter;
+import frc.robot.subsystems.Intake;
 
-public class ShootWithSlider extends Command {
-  /** Creates a new ShootWithSlider. */
-  FlywheelShooter shooter;
-  DoubleSupplier speed;
-  DoubleSupplier factor;
-  public ShootWithSlider(FlywheelShooter shooter, DoubleSupplier speed, DoubleSupplier factor) {
-    // Use addRequirements() here to declare subsystem dependencies.
+public class ShootSpeaker extends Command {
+  /** Creates a new ShootAmp. */
+  private FlywheelShooter shooter;
+  private Intake intake;
+  public ShootSpeaker(FlywheelShooter shooter, Intake intake) {
     this.shooter = shooter;
-    this.speed = speed;
-    this.factor = factor;
-    addRequirements(shooter);
+    this.intake = intake;
+    addRequirements(shooter, intake);
+    // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    shooter.fireDifference(1800, 0.1);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    shooter.fireDifference(speed.getAsDouble(), factor.getAsDouble());
+    intake.intake();
   }
 
   // Called once the command ends or is interrupted.

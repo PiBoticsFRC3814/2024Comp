@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,6 +20,8 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+  public DigitalInput in8 = new DigitalInput(8);
+  public DigitalInput in9 = new DigitalInput(9);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -83,7 +86,8 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    SmartDashboard.putNumber("factor", m_robotContainer.m_driverController.getThrottle());
+    SmartDashboard.putBoolean("8", in8.get());
+    SmartDashboard.putBoolean("9", in9.get());
   }
 
   @Override
