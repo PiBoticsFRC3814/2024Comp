@@ -86,10 +86,10 @@ public class RobotContainer {
     new JoystickButton(controlStick, Button.kRightBumper.value).whileFalse(new IntakeStop(m_intake));
     new JoystickButton(controlStick, Button.kLeftBumper.value).whileTrue(new Outake(m_intake));
     new JoystickButton(driveStick, Button.kX.value).whileTrue(new GyroReset(m_gyro, m_gyroSwerveDrive));
-    new JoystickButton(controlStick, Button.kA.value).whileTrue(new ShootAmp(m_shooter, m_intake));
-    new JoystickButton(controlStick, Button.kB.value).whileTrue(new ShootSpeaker(m_shooter, m_intake));
-    new JoystickButton(driveStick, Button.kLeftBumper.value).whileTrue(new DriveFast(m_robotStates));
-    new JoystickButton(driveStick, Button.kLeftBumper.value).whileFalse(new DriveSlow(m_robotStates));
+    new JoystickButton(controlStick, Button.kX.value).whileTrue(new ShootAmp(m_shooter, m_intake));
+    new JoystickButton(controlStick, Button.kA.value).whileTrue(new ShootSpeaker(m_shooter, m_intake));
+    new JoystickButton(driveStick, Button.kRightBumper.value).whileTrue(new DriveFast(m_robotStates));
+    new JoystickButton(driveStick, Button.kRightBumper.value).whileFalse(new DriveSlow(m_robotStates));
   }
 
   /**
