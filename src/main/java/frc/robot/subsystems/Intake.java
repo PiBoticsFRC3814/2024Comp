@@ -4,9 +4,11 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -18,10 +20,15 @@ public class Intake extends SubsystemBase {
   public Intake() {
     intakeMotor = new WPI_TalonSRX(Constants.INTAKE_ID);
     sensor = new DigitalInput(8);
+    intakeMotor.configPeakCurrentLimit(50);
   }
 
   public void intake(){
-    intakeMotor.set(0.81);
+    intakeMotor.set(0.75);
+  }
+
+  public void shoot(){
+    intakeMotor.set(1.0);
   }
 
   public void outtake(){
@@ -32,9 +39,18 @@ public class Intake extends SubsystemBase {
     intakeMotor.set(0.0);
   }
 
+  public void brake(){
+    intakeMotor.setNeutralMode(NeutralMode.Brake);
+  }
+
+  public void coast(){
+    intakeMotor.setNeutralMode(NeutralMode.Coast);
+  }
+
   @Override
   public void periodic() {
-    gotNote = sensor.get();
+    gotNote = !sensor.get();
+    SmartDashboard.putBoolean("Note", gotNote);
     // This method will be called once per scheduler run
   }
 }

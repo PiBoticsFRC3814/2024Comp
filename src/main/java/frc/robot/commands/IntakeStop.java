@@ -4,14 +4,17 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
 
 public class IntakeStop extends Command {
   /** Creates a new IntakeRun. */
   Intake intake;
+  Timer timer;
   public IntakeStop(Intake intake) {
     this.intake = intake;
+    timer = new Timer();
     addRequirements(intake);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -19,11 +22,14 @@ public class IntakeStop extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    timer.reset();
+    timer.start();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {intake.stop();}
+  public void execute() {
+  }
 
   // Called once the command ends or is interrupted.
   @Override

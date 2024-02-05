@@ -5,25 +5,27 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Intake;
+import frc.robot.Constants;
+import frc.robot.subsystems.RobotStates;
 
-public class IntakeRun extends Command {
-  /** Creates a new IntakeRun. */
-  Intake intake;
-  public IntakeRun(Intake intake) {
-    this.intake = intake;
-    addRequirements(intake);
+public class DriveFast extends Command {
+  /** Creates a new DriveFast. */
+  RobotStates robotStates;
+  public DriveFast(RobotStates robotStates) {
+    this.robotStates = robotStates;
+    addRequirements(robotStates);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {intake.intake();}
+  public void execute() {
+    robotStates.driveMultiplier = Constants.FAST_SPEED;
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -33,6 +35,6 @@ public class IntakeRun extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return intake.gotNote;
+    return true;
   }
 }

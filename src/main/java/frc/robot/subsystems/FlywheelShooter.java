@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -18,6 +19,7 @@ public class FlywheelShooter extends SubsystemBase {
   private SparkPIDController topPIDShoot;
   private CANSparkMax botShooter;
   private SparkPIDController botPIDShoot;
+  public RelativeEncoder speed;
   public FlywheelShooter() {
     topShooter = new CANSparkMax(Constants.TOP_SHOOT_ID, MotorType.kBrushless);
     topPIDShoot = topShooter.getPIDController();
@@ -39,6 +41,8 @@ public class FlywheelShooter extends SubsystemBase {
 		botPIDShoot.setFF(Constants.SHOOT_PID[1][4]);
     botShooter.setOpenLoopRampRate( 0.2 );
 		botShooter.setSmartCurrentLimit(50, 40);
+
+    speed = botShooter.getEncoder();
   }
 
   public void stopShooter(){
