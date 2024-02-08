@@ -99,9 +99,9 @@ public final class Constants {
 
   public static double[][] SHOOT_PID = { 
 		// kP   kI   kD  kIz  kFF  kMn  kMx
-		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.6e-4, -1.0, 1.0 }, //Front Right
-		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.6e-4, -1.0, 1.0 }, //Rear Right
-		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.6e-4, -1.0, 1.0 }, //Rear Left
-		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.6e-4, -1.0, 1.0 }  //Front Left
+		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.65e-4, -1.0, 1.0 }, //Front Right
+		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.65e-4, -1.0, 1.0 }, //Rear Right
+		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.65e-4, -1.0, 1.0 }, //Rear Left
+		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.65e-4, -1.0, 1.0 }  //Front Left
 	};
 }

@@ -14,6 +14,7 @@ public class ShootSpeaker extends Command {
   private FlywheelShooter shooter;
   private Intake intake;
   Timer timer;
+  private int count;
   public ShootSpeaker(FlywheelShooter shooter, Intake intake) {
     this.shooter = shooter;
     this.intake = intake;
@@ -27,16 +28,17 @@ public class ShootSpeaker extends Command {
   public void initialize() {
     timer.reset();
     timer.start();
-    intake.outtake();
+    intake.outtakeShoot();
     intake.coast();
-    shooter.fireDifference(4200, 0.0);
+    count = 0;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if((!intake.gotNote) && (shooter.speed.getVelocity() <= 4200) || timer.get() >= 0.2) intake.stop();
-    if(shooter.speed.getVelocity() >= 4200) intake.shoot();
+    if(timer.get() >= 0.3) shooter.fireDifference(4200, 0.0);
+    if((!intake.gotNote) && (shooter.speed.getVelocity() <= 4200) || timer.get() >= 0.3) intake.stop();
+    if((shooter.speed.getVelocity() >= 4100)) intake.shoot();
   }
 
   // Called once the command ends or is interrupted.

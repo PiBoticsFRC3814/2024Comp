@@ -29,14 +29,14 @@ public class ShootAmp extends Command {
     timer.start();
     intake.outtake();
     intake.coast();
-    shooter.fireDifference(1800, 0.1);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if((!intake.gotNote) && (shooter.speed.getVelocity() <= 1800) || timer.get() >= 0.2) intake.stop();
-    if(shooter.speed.getVelocity() >= 1800) intake.shoot();
+    if(timer.get() >= 0.3) shooter.fireDifference(1600, 0.09);
+    if((!intake.gotNote) && (shooter.speed.getVelocity() <= 1600) || timer.get() >= 0.3) intake.stop();
+    if(shooter.speed.getVelocity() >= 1600) intake.shoot();
   }
 
   // Called once the command ends or is interrupted.
