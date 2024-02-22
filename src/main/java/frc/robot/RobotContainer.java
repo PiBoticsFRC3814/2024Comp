@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.commands.Autos;
+import frc.robot.commands.ClimbMaunal;
 import frc.robot.commands.DriveFast;
 import frc.robot.commands.DriveSlow;
 import frc.robot.commands.ExampleCommand;
@@ -15,6 +16,7 @@ import frc.robot.commands.IntakeStop;
 import frc.robot.commands.Outake;
 import frc.robot.commands.ShootAmp;
 import frc.robot.commands.ShootSpeaker;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.FlywheelShooter;
 import frc.robot.subsystems.GyroSwerveDrive;
@@ -45,6 +47,7 @@ public class RobotContainer {
   private final RobotStates m_robotStates = new RobotStates();
   private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
   private final GyroSwerveDrive m_gyroSwerveDrive = new GyroSwerveDrive(m_robotStates, m_gyro);
+  private final Climber m_climber = new Climber();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   XboxController driveStick = new XboxController(2);
@@ -63,6 +66,10 @@ public class RobotContainer {
             m_gyro,
             m_gyroSwerveDrive,
             driveStick));
+
+    m_climber.setDefaultCommand(
+      new ClimbMaunal(m_climber, () -> -controlStick.getLeftY(), () -> -controlStick.getRightY())
+    );
     // Configure the trigger bindings
     double speed = 1300;//SmartDashboard.getNumber("Speed", 0.0);
     //m_shooter.setDefaultCommand(new ShootWithSlider(m_shooter, () -> speed, () -> m_driverController.getThrottle()));

@@ -96,6 +96,8 @@ public final class Constants {
   public static final int TOP_SHOOT_ID = 19;
   public static final int BOT_SHOOT_ID = 18;
   public static final int INTAKE_ID = 12;
+  public static final int CLIMB_LEFT = 50;
+  public static final int CLIMB_RIGHT = 51;
 
   public static double[][] SHOOT_PID = { 
 		// kP   kI   kD  kIz  kFF  kMn  kMx
