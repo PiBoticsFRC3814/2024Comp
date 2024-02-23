@@ -55,10 +55,10 @@ public class GyroSwerveDrive extends SubsystemBase {
     this.gyro = gyro;
 
     kinematics = new SwerveDriveKinematics(
-      new Translation2d(Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254, Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254),
-       new Translation2d(Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254, -Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254),
-        new Translation2d(-Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254, Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254),
-         new Translation2d(-Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254, -Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254)
+      new Translation2d(Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254),
+       new Translation2d(Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, -Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254),
+        new Translation2d(-Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254),
+         new Translation2d(-Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, -Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254)
     );
     odometry = new SwerveDriveOdometry(
       kinematics,
@@ -81,8 +81,8 @@ public class GyroSwerveDrive extends SubsystemBase {
       this::getSpeeds,
       this::driveUnits,
       new HolonomicPathFollowerConfig(
-        new PIDConstants(4.0, 0, 0.05),
-        new PIDConstants(0.1, 0, 0.005),
+        new PIDConstants(2.0, 0, 0.1),
+        new PIDConstants(2.0, 0, 0.1),
         Constants.MAX_DRIVETRAIN_SPEED * Constants.DRIVE_POSITION_CONVERSION / 60.0,
         0.29,
         new ReplanningConfig()
@@ -110,10 +110,10 @@ public class GyroSwerveDrive extends SubsystemBase {
 
   @Override
   public void periodic() {
-    poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(1000, 1000, Units.degreesToRadians(20)));
+    poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(20)));
     poseEstimator.updateWithTime(
       Timer.getFPGATimestamp(),
-       Rotation2d.fromDegrees(-(gyro.getAngle(gyro.getYawAxis()) % 360.0 - 180.0)),
+       Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis())),
         getModulePositions()
     );
   }
@@ -136,7 +136,7 @@ public class GyroSwerveDrive extends SubsystemBase {
       swerveMod[i].resetModule();
     }
     poseEstimator.resetPosition(
-      Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis()) % 360.0),
+      Rotation2d.fromDegrees(-gyro.getAngle(gyro.getYawAxis()) % 360.0),
        getModulePositions(),
         pose
     );
@@ -150,7 +150,7 @@ public class GyroSwerveDrive extends SubsystemBase {
   public void updateVisionPoseEstimator(Pose2d visionEstimate, double timestamp, double distance){
     //ramp measurement trust based on robot distance
     //poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.1 * Math.pow(15, distance), 0.1 * Math.pow(15, distance), Units.degreesToRadians(20)));
-    //poseEstimator.addVisionMeasurement(visionEstimate, timestamp);
+    poseEstimator.addVisionMeasurement(visionEstimate, timestamp);
     SmartDashboard.putNumber("Tag Distance ", distance);
     SmartDashboard.putNumber("Tag correlation ", 0.1 * Math.pow(15, distance));
   }
@@ -164,7 +164,7 @@ public class GyroSwerveDrive extends SubsystemBase {
   public void alteredGyroDrive(double dX, double dY, double dZ, double gyroAngle){
     dX = -applyDeadzone(dX, Constants.JOYSTICK_X_DEADZONE);
     dY = -applyDeadzone(dY, Constants.JOYSTICK_Y_DEADZONE);
-    dZ = -dZ;
+    dZ = -applyDeadzone(dZ, Constants.JOYSTICK_Z_DEADZONE) * 0.5;
     if ((dX != 0.0) || (dY != 0.0) || (dZ != 0.0)) {
       gyroDrive(
          dX * m_RobotStates.driveMultiplier,
@@ -203,14 +203,12 @@ public class GyroSwerveDrive extends SubsystemBase {
 
   public void driveUnits(ChassisSpeeds driveSpeeds) {
     //driveSpeeds = ChassisSpeeds.discretize(driveSpeeds, 0.2); 
-    double meterSecToRPM = (1 / Constants.DRIVE_POSITION_CONVERSION * 60.0);
-    double str = driveSpeeds.vyMetersPerSecond * meterSecToRPM / Constants.MAX_DRIVETRAIN_SPEED;
-    double fwd = driveSpeeds.vxMetersPerSecond * meterSecToRPM / Constants.MAX_DRIVETRAIN_SPEED;
+    double str = driveSpeeds.vyMetersPerSecond;
+    double fwd = driveSpeeds.vxMetersPerSecond;
     double rot = driveSpeeds.omegaRadiansPerSecond;
-    str = Math.abs(str) >= 0.005 ? str : 0.0;
-    fwd = Math.abs(fwd) >= 0.005 ? fwd : 0.0;
-    rot = Math.abs(rot) >= 0.01 ? rot : 0.0;
-    drive(str, fwd, rot);
+    double meterSecToRPM = (1 / Constants.DRIVE_POSITION_CONVERSION * 60.0);
+    System.out.println(fwd);
+    drive(str * meterSecToRPM / Constants.MAX_DRIVETRAIN_SPEED, fwd * meterSecToRPM / Constants.MAX_DRIVETRAIN_SPEED, rot);
   }
 
   public SwerveModuleState[] getModuleState(){

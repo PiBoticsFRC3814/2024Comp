@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -14,6 +15,12 @@ public class Climber extends SubsystemBase {
   /** Creates a new Climber. */
   WPI_TalonSRX climbLeft = new WPI_TalonSRX(Constants.CLIMB_LEFT);
   WPI_TalonSRX climbRight = new WPI_TalonSRX(Constants.CLIMB_RIGHT);
+
+  private DutyCycleEncoder leftEncoder = new DutyCycleEncoder(6);
+  private DutyCycleEncoder rightEncoder = new DutyCycleEncoder(7);
+
+  private double leftRotation = 0;
+  private double rightRotation = 0;
   
   public Climber() {
     climbLeft.configOpenloopRamp(0.2);
@@ -25,8 +32,9 @@ public class Climber extends SubsystemBase {
   }
 
   public void control(double driveLeft, double driveRight){
-    climbLeft.set(driveLeft);
-    climbRight.set(driveRight);
+    if(leftEncoder.getDistance() <= Constants.MAX_CLIMB_REVS || driveLeft <= 0.0) climbLeft.set(driveLeft); else climbLeft.set(0.0);
+    if(rightEncoder.getDistance() <= Constants.MAX_CLIMB_REVS || driveRight <= 0.0) climbRight.set(driveRight); else climbRight.set(0.0);
+    //climbRight.set(driveRight);
   }
 
   @Override

@@ -59,16 +59,16 @@ public class RobotContainer {
     m_gyroSwerveDrive.setDefaultCommand(
         new GyroSwerveDriveCommand(
             () -> driveStick.getLeftX(),
-            () -> driveStick.getLeftY(),
+            () -> -driveStick.getLeftY(),
             () -> driveStick.getRightX(),
-            () -> -driveStick.getRightY(),
+            () -> driveStick.getRightY(),
             () -> driveStick.getPOV(0),
             m_gyro,
             m_gyroSwerveDrive,
             driveStick));
 
     m_climber.setDefaultCommand(
-      new ClimbMaunal(m_climber, () -> -controlStick.getLeftY(), () -> -controlStick.getRightY())
+      new ClimbMaunal(m_climber, () -> -controlStick.getRightY(), () -> -controlStick.getLeftY())
     );
     // Configure the trigger bindings
     double speed = 1300;//SmartDashboard.getNumber("Speed", 0.0);
