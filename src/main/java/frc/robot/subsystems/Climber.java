@@ -14,6 +14,7 @@ public class Climber extends SubsystemBase {
   /** Creates a new Climber. */
   WPI_TalonSRX climbLeft = new WPI_TalonSRX(Constants.CLIMB_LEFT);
   WPI_TalonSRX climbRight = new WPI_TalonSRX(Constants.CLIMB_RIGHT);
+  
   public Climber() {
     climbLeft.configOpenloopRamp(0.2);
     climbRight.configOpenloopRamp(0.2);
