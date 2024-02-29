@@ -8,17 +8,20 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.FlywheelShooter;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.RobotStates;
 
 public class ShootAmp extends Command {
   /** Creates a new ShootAmp. */
   private FlywheelShooter shooter;
   private Intake intake;
   Timer timer;
-  public ShootAmp(FlywheelShooter shooter, Intake intake) {
+  RobotStates robotState;
+  public ShootAmp(FlywheelShooter shooter, Intake intake, RobotStates robotState) {
     this.shooter = shooter;
     this.intake = intake;
     timer = new Timer();
-    addRequirements(shooter, intake);
+    this.robotState = robotState;
+    addRequirements(shooter, intake, robotState);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -28,16 +31,20 @@ public class ShootAmp extends Command {
     timer.reset();
     timer.start();
     intake.outtake();
-    intake.coast();
+    intake.brake();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(timer.get() >= 0.3) shooter.fireDifference(1600, 0.09);
-    if((!intake.gotNote) && (shooter.speed.getVelocity() <= 1600) || timer.get() >= 0.3) intake.stop();
+    if(timer.get() >= 0.3) shooter.fireDifference(1700, 0.08);
+    if(((!intake.gotNote) && (shooter.speed.getVelocity() <= 1700)) || timer.get() >= 0.3) intake.stop();
     if(shooter.speed.getVelocity() >= 1600) intake.shoot();
   }
+
+  //0 1700 0.08
+  //6 1900 0.2
+  //12 2100 0.3
 
   // Called once the command ends or is interrupted.
   @Override

@@ -19,8 +19,9 @@ public class Intake extends SubsystemBase {
   private DigitalInput sensor;
   public Intake() {
     intakeMotor = new WPI_TalonSRX(Constants.INTAKE_ID);
-    sensor = new DigitalInput(8);
-    intakeMotor.configPeakCurrentLimit(50);
+    sensor = new DigitalInput(9);
+    intakeMotor.configPeakCurrentLimit(15);
+    intakeMotor.setNeutralMode(NeutralMode.Brake);
   }
 
   public void intake(){

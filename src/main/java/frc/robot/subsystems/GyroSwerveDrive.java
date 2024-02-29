@@ -94,7 +94,7 @@ public class GyroSwerveDrive extends SubsystemBase {
 
                     var alliance = DriverStation.getAlliance();
                     if (alliance.isPresent()) {
-                        return alliance.get() != DriverStation.Alliance.Red;
+                        return alliance.get() == DriverStation.Alliance.Red;
                     }
                     return false;
                 },
@@ -110,7 +110,7 @@ public class GyroSwerveDrive extends SubsystemBase {
 
   @Override
   public void periodic() {
-    poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(20)));
+    poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(1.0, 1.0, Units.degreesToRadians(20)));
     poseEstimator.updateWithTime(
       Timer.getFPGATimestamp(),
        Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis())),
@@ -164,7 +164,7 @@ public class GyroSwerveDrive extends SubsystemBase {
   public void alteredGyroDrive(double dX, double dY, double dZ, double gyroAngle){
     dX = -applyDeadzone(dX, Constants.JOYSTICK_X_DEADZONE);
     dY = -applyDeadzone(dY, Constants.JOYSTICK_Y_DEADZONE);
-    dZ = -applyDeadzone(dZ, Constants.JOYSTICK_Z_DEADZONE) * 0.5;
+    dZ = -applyDeadzone(dZ, Constants.JOYSTICK_Z_DEADZONE);
     if ((dX != 0.0) || (dY != 0.0) || (dZ != 0.0)) {
       gyroDrive(
          dX * m_RobotStates.driveMultiplier,

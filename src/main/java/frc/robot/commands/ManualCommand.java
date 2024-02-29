@@ -4,60 +4,48 @@
 
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.FlywheelShooter;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.RobotStates;
 
-public class ShootSpeaker extends Command {
+public class ManualCommand extends Command {
   /** Creates a new ShootAmp. */
   private FlywheelShooter shooter;
-  private Intake intake;
   Timer timer;
-  private int count;
-  RobotStates robotState;
-  public ShootSpeaker(FlywheelShooter shooter, Intake intake, RobotStates robotState) {
+  DoubleSupplier speed;
+  DoubleSupplier factor;
+  public ManualCommand(FlywheelShooter shooter, DoubleSupplier speed, DoubleSupplier factor) {
     this.shooter = shooter;
-    this.intake = intake;
     timer = new Timer();
-    this.robotState = robotState;
-    addRequirements(shooter, intake, robotState);
+    this.factor = factor;
+    this.speed = speed;
+    addRequirements(shooter);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    timer.reset();
-    timer.start();
-    intake.outtakeShoot();
-    intake.brake();
-    count = 0;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(timer.get() >= 0.5) shooter.fireDifference(4500, -0.0);
-    if(((!intake.gotNote) || timer.get() >= 1.0) && shooter.speed.getVelocity() <= 3500) intake.stop();
-    if((shooter.speed.getVelocity() >= 4200)) intake.shoot();
+    shooter.fireDifference(speed.getAsDouble() * 5000, factor.getAsDouble() * 0.2 - 0.1);
   }
-
-  //28 3650 -0.1
-  //10 3900 -0.1
-  //0 4500 0.0
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    shooter.stopShooter();
-    intake.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (timer.get() >= 1.5 && robotState.autonomous);
+    return false;
   }
 }

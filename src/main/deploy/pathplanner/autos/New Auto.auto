@@ -6,21 +6,108 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "New Path"
+            "name": "gyroRest"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerFire"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Middle Pickup"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeRun"
+                }
+              }
+            ]
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Example Path"
+            "pathName": "Middle Return"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerFire"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Stage Pickup"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeRun"
+                }
+              }
+            ]
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "New New Path"
+            "pathName": "Stage Return"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerFire"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Amp Pickup"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeRun"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Return"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerFire"
           }
         }
       ]

@@ -13,15 +13,23 @@ import frc.robot.commands.GyroReset;
 import frc.robot.commands.GyroSwerveDriveCommand;
 import frc.robot.commands.IntakeRun;
 import frc.robot.commands.IntakeStop;
+import frc.robot.commands.ManualCommand;
+import frc.robot.commands.ManualIntake;
 import frc.robot.commands.Outake;
 import frc.robot.commands.ShootAmp;
 import frc.robot.commands.ShootSpeaker;
+import frc.robot.commands.ShooterIntake;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.FlywheelShooter;
 import frc.robot.subsystems.GyroSwerveDrive;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.RobotStates;
+
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
@@ -44,10 +52,11 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final FlywheelShooter m_shooter = new FlywheelShooter();
   private final Intake m_intake = new Intake();
-  private final RobotStates m_robotStates = new RobotStates();
-  private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
-  private final GyroSwerveDrive m_gyroSwerveDrive = new GyroSwerveDrive(m_robotStates, m_gyro);
+  public final RobotStates m_robotStates = new RobotStates();
+  public final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
+  public final GyroSwerveDrive m_gyroSwerveDrive = new GyroSwerveDrive(m_robotStates, m_gyro);
   private final Climber m_climber = new Climber();
+  private final Limelight m_limelight = new Limelight(m_robotStates, m_gyroSwerveDrive);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   XboxController driveStick = new XboxController(2);
@@ -59,20 +68,30 @@ public class RobotContainer {
     m_gyroSwerveDrive.setDefaultCommand(
         new GyroSwerveDriveCommand(
             () -> driveStick.getLeftX(),
-            () -> -driveStick.getLeftY(),
+            () -> driveStick.getLeftY(),
             () -> driveStick.getRightX(),
-            () -> driveStick.getRightY(),
+            () -> -driveStick.getRightY(),
             () -> driveStick.getPOV(0),
             m_gyro,
             m_gyroSwerveDrive,
             driveStick));
 
     m_climber.setDefaultCommand(
-      new ClimbMaunal(m_climber, () -> -controlStick.getRightY(), () -> -controlStick.getLeftY())
+      new ClimbMaunal(m_climber, () -> -controlStick.getRightY(), () -> controlStick.getLeftY())
     );
+
+    //m_shooter.setDefaultCommand(new ManualCommand(m_shooter, () -> controlStick.getLeftTriggerAxis(), () -> controlStick.getRightTriggerAxis()));
     // Configure the trigger bindings
     double speed = 1300;//SmartDashboard.getNumber("Speed", 0.0);
     //m_shooter.setDefaultCommand(new ShootWithSlider(m_shooter, () -> speed, () -> m_driverController.getThrottle()));
+
+    NamedCommands.registerCommand("intakeRun", new IntakeRun(m_intake));
+    NamedCommands.registerCommand("intakeStop", new IntakeStop(m_intake));
+    NamedCommands.registerCommand("SpeakerFire", new ShootSpeaker(m_shooter, m_intake, m_robotStates));
+    NamedCommands.registerCommand("shootAmp", new ShootAmp(m_shooter, m_intake, m_robotStates));
+    NamedCommands.registerCommand("gyroRest", new GyroReset(m_gyro, m_gyroSwerveDrive));
+
+
     configureBindings();
   }
 
@@ -90,13 +109,15 @@ public class RobotContainer {
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     new JoystickButton(controlStick, Button.kRightBumper.value).whileTrue(new IntakeRun(m_intake));
-    new JoystickButton(controlStick, Button.kRightBumper.value).whileFalse(new IntakeStop(m_intake));
+    //new JoystickButton(controlStick, Button.kRightBumper.value).whileFalse(new IntakeStop(m_intake));
     new JoystickButton(controlStick, Button.kLeftBumper.value).whileTrue(new Outake(m_intake));
     new JoystickButton(driveStick, Button.kX.value).whileTrue(new GyroReset(m_gyro, m_gyroSwerveDrive));
-    new JoystickButton(controlStick, Button.kX.value).whileTrue(new ShootAmp(m_shooter, m_intake));
-    new JoystickButton(controlStick, Button.kB.value).whileTrue(new ShootSpeaker(m_shooter, m_intake));
+    new JoystickButton(controlStick, Button.kX.value).whileTrue(new ShootAmp(m_shooter, m_intake, m_robotStates));
+    new JoystickButton(controlStick, Button.kB.value).whileTrue(new ShootSpeaker(m_shooter, m_intake, m_robotStates));
     new JoystickButton(driveStick, Button.kRightBumper.value).whileTrue(new DriveFast(m_robotStates));
     new JoystickButton(driveStick, Button.kRightBumper.value).whileFalse(new DriveSlow(m_robotStates));
+    new JoystickButton(controlStick, Button.kA.value).whileTrue(new ShooterIntake(m_shooter));
+    new JoystickButton(controlStick, Button.kY.value).whileTrue(new ManualIntake(m_intake));
   }
 
   /**
@@ -106,6 +127,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
+    return new PathPlannerAuto("New Auto");
   }
 }

@@ -32,9 +32,10 @@ public class Climber extends SubsystemBase {
   }
 
   public void control(double driveLeft, double driveRight){
-    if(leftEncoder.getDistance() <= Constants.MAX_CLIMB_REVS || driveLeft <= 0.0) climbLeft.set(driveLeft); else climbLeft.set(0.0);
-    if(rightEncoder.getDistance() <= Constants.MAX_CLIMB_REVS || driveRight <= 0.0) climbRight.set(driveRight); else climbRight.set(0.0);
-    //climbRight.set(driveRight);
+    //if(leftEncoder.getDistance() <= Constants.MAX_CLIMB_REVS || driveLeft <= 0.0) climbLeft.set(driveLeft); else climbLeft.set(0.0);
+    //if(rightEncoder.getDistance() <= Constants.MAX_CLIMB_REVS || driveRight <= 0.0) climbRight.set(driveRight); else climbRight.set(0.0);
+    climbRight.set(driveRight);
+    climbLeft.set(driveLeft);
   }
 
   @Override
