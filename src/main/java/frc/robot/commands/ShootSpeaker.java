@@ -35,7 +35,7 @@ public class ShootSpeaker extends Command {
     intake.outtakeShoot();
     intake.brake();
     count = 0;
-    double distance = 8;
+    double distance = 1;
     //values from linear regression given datapoints causes I'm too lazy
     //28 3650 -0.1
     //10 3900 -0.1

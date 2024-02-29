@@ -33,7 +33,7 @@ public class ShootAmp extends Command {
     timer.start();
     intake.outtake();
     intake.brake();
-    double distance = 30;
+    double distance = 1;
     //values from linear regression given datapoints causes I'm too lazy
     //0 1750
     //3 1800
