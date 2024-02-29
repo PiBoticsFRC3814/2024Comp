@@ -16,6 +16,7 @@ public class ShootAmp extends Command {
   private Intake intake;
   Timer timer;
   RobotStates robotState;
+  double speed;
   public ShootAmp(FlywheelShooter shooter, Intake intake, RobotStates robotState) {
     this.shooter = shooter;
     this.intake = intake;
@@ -32,19 +33,24 @@ public class ShootAmp extends Command {
     timer.start();
     intake.outtake();
     intake.brake();
+    double distance = 30;
+    //values from linear regression given datapoints causes I'm too lazy
+    //0 1750
+    //3 1800
+    //6 1900
+    //12 2000
+    speed = 740.16 * Math.log(186.236 * distance + 5334.16) - 4607.85;
+    System.out.println(speed);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
+
   @Override
   public void execute() {
-    if(timer.get() >= 0.3) shooter.fireDifference(1700, 0.08);
-    if(((!intake.gotNote) && (shooter.speed.getVelocity() <= 1700)) || timer.get() >= 0.3) intake.stop();
-    if(shooter.speed.getVelocity() >= 1600) intake.shoot();
+    if(timer.get() >= 0.3) shooter.fireDifference(speed, 0.30);
+    if(((!intake.gotNote) && (shooter.speed.getVelocity() <= speed)) || timer.get() >= 0.3) intake.stop();
+    if(shooter.speed.getVelocity() >= speed) intake.shoot();
   }
-
-  //0 1700 0.08
-  //6 1900 0.2
-  //12 2100 0.3
 
   // Called once the command ends or is interrupted.
   @Override

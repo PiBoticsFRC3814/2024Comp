@@ -22,6 +22,8 @@ public class Intake extends SubsystemBase {
     sensor = new DigitalInput(9);
     intakeMotor.configPeakCurrentLimit(15);
     intakeMotor.setNeutralMode(NeutralMode.Brake);
+    intakeMotor.configVoltageCompSaturation(10);
+    intakeMotor.enableVoltageCompensation(true);
   }
 
   public void intake(){

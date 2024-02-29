@@ -17,6 +17,7 @@ public class ShootSpeaker extends Command {
   Timer timer;
   private int count;
   RobotStates robotState;
+  double speed;
   public ShootSpeaker(FlywheelShooter shooter, Intake intake, RobotStates robotState) {
     this.shooter = shooter;
     this.intake = intake;
@@ -34,19 +35,21 @@ public class ShootSpeaker extends Command {
     intake.outtakeShoot();
     intake.brake();
     count = 0;
+    double distance = 8;
+    //values from linear regression given datapoints causes I'm too lazy
+    //28 3650 -0.1
+    //10 3900 -0.1
+    //0 4500 0.0
+    speed = -259.36 * Math.log(0.00721146 * distance + 0.00791717) + 3245.03;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(timer.get() >= 0.5) shooter.fireDifference(4500, -0.0);
+    if(timer.get() >= 0.5) shooter.fireDifference(speed, -0.08);
     if(((!intake.gotNote) || timer.get() >= 1.0) && shooter.speed.getVelocity() <= 3500) intake.stop();
-    if((shooter.speed.getVelocity() >= 4200)) intake.shoot();
+    if((shooter.speed.getVelocity() >= speed)) intake.shoot();
   }
-
-  //28 3650 -0.1
-  //10 3900 -0.1
-  //0 4500 0.0
 
   // Called once the command ends or is interrupted.
   @Override
