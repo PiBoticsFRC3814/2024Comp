@@ -72,6 +72,8 @@ public class RobotContainer {
             () -> driveStick.getRightX(),
             () -> -driveStick.getRightY(),
             () -> driveStick.getPOV(0),
+            () -> driveStick.getRightTriggerAxis() >= 0.8,
+            () -> driveStick.getLeftTriggerAxis() >= 0.8,
             m_gyro,
             m_gyroSwerveDrive,
             driveStick));

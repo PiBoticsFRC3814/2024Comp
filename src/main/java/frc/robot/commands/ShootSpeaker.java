@@ -51,7 +51,7 @@ public class ShootSpeaker extends Command {
     //10 3900 -0.1
     //0 4500 0.0
     distance = distance >= 0.0 ? distance : 0.0;
-    speed = -259.36 * Math.log(0.00721146 * distance + 0.00791717) + 3245.03;
+    speed = distance >= 1 ? -259.36 * Math.log(0.00721146 * distance + 0.00791717) + 3245.03 : 4500;
     if(timer.get() >= 0.5) shooter.fireDifference(speed, -0.1);
     if(((!intake.gotNote) || timer.get() >= 0.3) && shooter.speed.getVelocity() <= speed) intake.stop();
     if((shooter.speed.getVelocity() >= (speed - speed * 0.1) * 0.9)) intake.shoot();
