@@ -57,7 +57,6 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     gotNote = !sensor.get();
-    SmartDashboard.putBoolean("Note", gotNote);
     // This method will be called once per scheduler run
   }
 }

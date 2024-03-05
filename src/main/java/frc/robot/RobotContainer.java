@@ -50,13 +50,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-  private final FlywheelShooter m_shooter = new FlywheelShooter();
-  private final Intake m_intake = new Intake();
+  public final FlywheelShooter m_shooter = new FlywheelShooter();
+  public final Intake m_intake = new Intake();
   public final RobotStates m_robotStates = new RobotStates();
   public final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
   public final GyroSwerveDrive m_gyroSwerveDrive = new GyroSwerveDrive(m_robotStates, m_gyro);
-  private final Climber m_climber = new Climber();
-  private final Limelight m_limelight = new Limelight(m_robotStates, m_gyroSwerveDrive);
+  public final Climber m_climber = new Climber();
+  public final Limelight m_limelight = new Limelight(m_robotStates, m_gyroSwerveDrive);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   XboxController driveStick = new XboxController(2);
@@ -87,8 +87,8 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("intakeRun", new IntakeRun(m_intake));
     NamedCommands.registerCommand("intakeStop", new IntakeStop(m_intake));
-    NamedCommands.registerCommand("SpeakerFire", new ShootSpeaker(m_shooter, m_intake, m_robotStates));
-    NamedCommands.registerCommand("shootAmp", new ShootAmp(m_shooter, m_intake, m_robotStates));
+    NamedCommands.registerCommand("SpeakerFire", new ShootSpeaker(m_shooter, m_intake, m_robotStates, m_gyroSwerveDrive));
+    NamedCommands.registerCommand("shootAmp", new ShootAmp(m_shooter, m_intake, m_robotStates, m_gyroSwerveDrive));
     NamedCommands.registerCommand("gyroRest", new GyroReset(m_gyro, m_gyroSwerveDrive));
 
 
@@ -112,8 +112,8 @@ public class RobotContainer {
     //new JoystickButton(controlStick, Button.kRightBumper.value).whileFalse(new IntakeStop(m_intake));
     new JoystickButton(controlStick, Button.kLeftBumper.value).whileTrue(new Outake(m_intake));
     new JoystickButton(driveStick, Button.kX.value).whileTrue(new GyroReset(m_gyro, m_gyroSwerveDrive));
-    new JoystickButton(controlStick, Button.kX.value).whileTrue(new ShootAmp(m_shooter, m_intake, m_robotStates));
-    new JoystickButton(controlStick, Button.kB.value).whileTrue(new ShootSpeaker(m_shooter, m_intake, m_robotStates));
+    new JoystickButton(controlStick, Button.kX.value).whileTrue(new ShootAmp(m_shooter, m_intake, m_robotStates, m_gyroSwerveDrive));
+    new JoystickButton(controlStick, Button.kB.value).whileTrue(new ShootSpeaker(m_shooter, m_intake, m_robotStates, m_gyroSwerveDrive));
     new JoystickButton(driveStick, Button.kRightBumper.value).whileTrue(new DriveFast(m_robotStates));
     new JoystickButton(driveStick, Button.kRightBumper.value).whileFalse(new DriveSlow(m_robotStates));
     new JoystickButton(controlStick, Button.kA.value).whileTrue(new ShooterIntake(m_shooter));

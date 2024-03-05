@@ -5,6 +5,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.GyroSwerveDrive;
@@ -19,10 +20,12 @@ public class GyroSwerveDriveCommand extends Command {
   IntSupplier povHat;
   boolean driveHeading;
   ADIS16470_IMU m_gyro;
-  GyroSwerveDrive m_gyroSwerveDrive;
+  GyroSwerveDrive drivetrain;
   XboxController driveStick;
-
+  DoubleSupplier triggerR;
+  DoubleSupplier triggerL;
   PIDController turnController = new PIDController(0.02, 0.1, 0.001);
+  double setAngle;
 
   public GyroSwerveDriveCommand(
       DoubleSupplier dX,
@@ -39,14 +42,14 @@ public class GyroSwerveDriveCommand extends Command {
     this.dZ2 = dZ2;
     this.povHat = povHat;
     m_gyro = imu;
-    m_gyroSwerveDrive = gyroSwerveDrive;
+    drivetrain = gyroSwerveDrive;
     this.driveStick = driveStick;
     turnController.reset();
     turnController.setIntegratorRange(-0.2, 0.2);
     turnController.enableContinuousInput(0.0, 360.0);
     turnController.setTolerance(0.05);
 
-    addRequirements(m_gyroSwerveDrive);
+    addRequirements(drivetrain);
   }
 
   private double applyDeadzone(double input, double deadzone) {
@@ -57,18 +60,16 @@ public class GyroSwerveDriveCommand extends Command {
 
   @Override
   public void execute() {
-    if((Math.abs(m_gyro.getAccelX()) >= 20) || (Math.abs(m_gyro.getAccelY()) >= 20)){
-      driveStick.setRumble(RumbleType.kBothRumble, 1.0);
-    } else {
-      driveStick.setRumble(RumbleType.kBothRumble, 0.0);
-    }
+    setAngle = Math.atan2(applyDeadzone(dZ.getAsDouble(), Constants.JOYSTICK_Z_DEADZONE), applyDeadzone(dZ2.getAsDouble(), Constants.JOYSTICK_Z2_DEADZONE)) / Math.PI * 180.0;
+    //if(triggerPressL){setAngle = Math.atan2(applyDeadzone(dZ.getAsDouble(), Constants.JOYSTICK_Z_DEADZONE), applyDeadzone(dZ2.getAsDouble(), Constants.JOYSTICK_Z2_DEADZONE)) / Math.PI * 180.0;}
+    //if(triggerPressL){setAngle = Math.atan2(applyDeadzone(dZ.getAsDouble(), Constants.JOYSTICK_Z_DEADZONE), applyDeadzone(dZ2.getAsDouble(), Constants.JOYSTICK_Z2_DEADZONE)) / Math.PI * 180.0;}
+
     driveHeading = (0.0 < Math.abs(applyDeadzone(dZ.getAsDouble(), Constants.JOYSTICK_Z_DEADZONE))) || (0.0 < Math.abs(applyDeadzone(dZ2.getAsDouble(), Constants.JOYSTICK_Z2_DEADZONE)));
-    double setAngle = Math.atan2(applyDeadzone(dZ.getAsDouble(), Constants.JOYSTICK_Z_DEADZONE), applyDeadzone(dZ2.getAsDouble(), Constants.JOYSTICK_Z2_DEADZONE)) / Math.PI * 180.0;
     setAngle = setAngle < 0.0 ? 360 + setAngle : setAngle;
     if(driveHeading){
       headingCorrection = dZ.getAsDouble() * dZ.getAsDouble() + dZ2.getAsDouble() * dZ2.getAsDouble() <= 9.0/16.0 ? 0.0 : MathUtil.clamp(turnController.calculate(360.0 - (m_gyro.getAngle(m_gyro.getYawAxis()) % 360.0), setAngle), -1.0, 1.0);
     }
-    m_gyroSwerveDrive.alteredGyroDrive(
+    drivetrain.alteredGyroDrive(
         dX.getAsDouble(),
           dY.getAsDouble(),
             driveHeading ? headingCorrection : 0.0,

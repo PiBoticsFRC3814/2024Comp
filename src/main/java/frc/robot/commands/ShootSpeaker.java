@@ -5,8 +5,10 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.FlywheelShooter;
+import frc.robot.subsystems.GyroSwerveDrive;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.RobotStates;
 
@@ -18,12 +20,14 @@ public class ShootSpeaker extends Command {
   private int count;
   RobotStates robotState;
   double speed;
-  public ShootSpeaker(FlywheelShooter shooter, Intake intake, RobotStates robotState) {
+  GyroSwerveDrive drivetrain;
+  public ShootSpeaker(FlywheelShooter shooter, Intake intake, RobotStates robotState, GyroSwerveDrive drivetrain) {
     this.shooter = shooter;
     this.intake = intake;
     timer = new Timer();
+    this.drivetrain = drivetrain;
     this.robotState = robotState;
-    addRequirements(shooter, intake, robotState);
+    addRequirements(shooter, intake, robotState, drivetrain);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -35,20 +39,22 @@ public class ShootSpeaker extends Command {
     intake.outtakeShoot();
     intake.brake();
     count = 0;
-    double distance = 1;
-    //values from linear regression given datapoints causes I'm too lazy
-    //28 3650 -0.1
-    //10 3900 -0.1
-    //0 4500 0.0
-    speed = -259.36 * Math.log(0.00721146 * distance + 0.00791717) + 3245.03;
+    //speed = 4100;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(timer.get() >= 0.5) shooter.fireDifference(speed, -0.08);
-    if(((!intake.gotNote) || timer.get() >= 1.0) && shooter.speed.getVelocity() <= 3500) intake.stop();
-    if((shooter.speed.getVelocity() >= speed)) intake.shoot();
+    double distance = 325 - Math.sqrt(Math.pow(Math.abs(drivetrain.getPose().getX()) - 8.308975,2.0) + Math.pow(drivetrain.getPose().getY() - 1.442593,2.0)) * 1000 / 25.4;
+    //values from linear regression given datapoints causes I'm too lazy
+    //28 3650 -0.1
+    //10 3900 -0.1
+    //0 4500 0.0
+    distance = distance >= 0.0 ? distance : 0.0;
+    speed = -259.36 * Math.log(0.00721146 * distance + 0.00791717) + 3245.03;
+    if(timer.get() >= 0.5) shooter.fireDifference(speed, -0.1);
+    if(((!intake.gotNote) || timer.get() >= 0.3) && shooter.speed.getVelocity() <= speed) intake.stop();
+    if((shooter.speed.getVelocity() >= (speed - speed * 0.1) * 0.9)) intake.shoot();
   }
 
   // Called once the command ends or is interrupted.

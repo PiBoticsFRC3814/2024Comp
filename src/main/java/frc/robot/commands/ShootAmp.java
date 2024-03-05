@@ -5,8 +5,10 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.FlywheelShooter;
+import frc.robot.subsystems.GyroSwerveDrive;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.RobotStates;
 
@@ -17,12 +19,14 @@ public class ShootAmp extends Command {
   Timer timer;
   RobotStates robotState;
   double speed;
-  public ShootAmp(FlywheelShooter shooter, Intake intake, RobotStates robotState) {
+  GyroSwerveDrive drivetrain;
+  public ShootAmp(FlywheelShooter shooter, Intake intake, RobotStates robotState, GyroSwerveDrive drivetrain) {
     this.shooter = shooter;
     this.intake = intake;
     timer = new Timer();
     this.robotState = robotState;
-    addRequirements(shooter, intake, robotState);
+    this.drivetrain = drivetrain;
+    addRequirements(shooter, intake, robotState, drivetrain);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -33,13 +37,6 @@ public class ShootAmp extends Command {
     timer.start();
     intake.outtake();
     intake.brake();
-    double distance = 1;
-    //values from linear regression given datapoints causes I'm too lazy
-    //0 1750
-    //3 1800
-    //6 1900
-    //12 2000
-    speed = 740.16 * Math.log(186.236 * distance + 5334.16) - 4607.85;
     System.out.println(speed);
   }
 
@@ -47,6 +44,14 @@ public class ShootAmp extends Command {
 
   @Override
   public void execute() {
+    double distance = 230 - Math.sqrt(Math.pow(Math.abs(drivetrain.getPose().getX()) - 6.429375,2.0) + Math.pow(drivetrain.getPose().getY() - 4.098925,2.0)) * 1000 / 25.4;
+    //values from linear regression given datapoints causes I'm too lazy
+    //0 1750
+    //3 1800
+    //6 1900
+    //12 2000
+    distance = distance >= 0.0 ? distance : 0.0;
+    speed = distance >= 1 ? 740.16 * Math.log(186.236 * distance + 5334.16) - 4607.85 : 1700;
     if(timer.get() >= 0.3) shooter.fireDifference(speed, 0.30);
     if(((!intake.gotNote) && (shooter.speed.getVelocity() <= speed)) || timer.get() >= 0.3) intake.stop();
     if(shooter.speed.getVelocity() >= speed) intake.shoot();

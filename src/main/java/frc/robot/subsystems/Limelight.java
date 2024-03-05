@@ -34,8 +34,8 @@ public class Limelight extends SubsystemBase {
 
         Pose2d tempPose = LimelightHelpers.toPose2D(LimelightHelpers.getBotPose_wpiBlue("limelight"));
         if(tempPose.getX() != -1000.0){ // Checks if pose is valid
-          double distance = Math.sqrt(Math.pow(targetPose2d.getX(), 2.0) + Math.pow(targetPose2d.getY(), 2.0));
-          m_drivetrain.updateVisionPoseEstimator(tempPose, Timer.getFPGATimestamp(), distance);
+          //double distance = Math.sqrt(Math.pow(targetPose2d.getX(), 2.0) + Math.pow(targetPose2d.getY(), 2.0));
+          m_drivetrain.updateVisionPoseEstimator(tempPose, Timer.getFPGATimestamp());
         }
       }
     }

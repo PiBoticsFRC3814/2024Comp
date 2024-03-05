@@ -60,8 +60,6 @@ public class FlywheelShooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Top Speed", topShooter.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Bottom Speed", botShooter.getEncoder().getVelocity());
     // This method will be called once per scheduler run
   }
 }

@@ -32,16 +32,12 @@ public class GyroSwerveDrive extends SubsystemBase {
   private double[] angle = {0.0, 0.0, 0.0, 0.0};
   private RobotStates m_RobotStates;
 
-  private SlewRateLimiter joystickSlewLimiterX;
-  private SlewRateLimiter joystickSlewLimiterY;
-  private SlewRateLimiter joystickSlewLimiterZ;
-
   private SwerveDriveKinematics kinematics;
-  private SwerveDriveOdometry   odometry;
   private SwerveDrivePoseEstimator poseEstimator;
   private ADIS16470_IMU gyro;
 
   public boolean trustVision;
+  public Pose2d currentPose;
 
   private SwerveModule[] swerveMod = {
     new SwerveModule(0), new SwerveModule(1), new SwerveModule(2), new SwerveModule(3)
@@ -49,9 +45,6 @@ public class GyroSwerveDrive extends SubsystemBase {
 
   public GyroSwerveDrive(RobotStates robotStates, ADIS16470_IMU gyro) {
     m_RobotStates = robotStates;
-    joystickSlewLimiterX = new SlewRateLimiter(Constants.JOYSTICK_X_SLEW_RATE);
-    joystickSlewLimiterY = new SlewRateLimiter(Constants.JOYSTICK_Y_SLEW_RATE);
-    joystickSlewLimiterZ = new SlewRateLimiter(Constants.JOYSTICK_Z_SLEW_RATE);
     this.gyro = gyro;
 
     kinematics = new SwerveDriveKinematics(
@@ -60,12 +53,6 @@ public class GyroSwerveDrive extends SubsystemBase {
         new Translation2d(-Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254),
          new Translation2d(-Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, -Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254)
     );
-    odometry = new SwerveDriveOdometry(
-      kinematics,
-       Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis())),
-        getModulePositions()
-    );
-
     poseEstimator = new SwerveDrivePoseEstimator(
       kinematics, 
       Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis())),
@@ -116,6 +103,7 @@ public class GyroSwerveDrive extends SubsystemBase {
        Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis())),
         getModulePositions()
     );
+    
   }
 
   public Pose2d getPose(){
@@ -147,12 +135,10 @@ public class GyroSwerveDrive extends SubsystemBase {
     poseEstimator.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), getPose());
   }
 
-  public void updateVisionPoseEstimator(Pose2d visionEstimate, double timestamp, double distance){
+  public void updateVisionPoseEstimator(Pose2d visionEstimate, double timestamp){
     //ramp measurement trust based on robot distance
     //poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.1 * Math.pow(15, distance), 0.1 * Math.pow(15, distance), Units.degreesToRadians(20)));
     poseEstimator.addVisionMeasurement(visionEstimate, timestamp);
-    SmartDashboard.putNumber("Tag Distance ", distance);
-    SmartDashboard.putNumber("Tag correlation ", 0.1 * Math.pow(15, distance));
   }
 
   private double applyDeadzone(double input, double deadzone) {
