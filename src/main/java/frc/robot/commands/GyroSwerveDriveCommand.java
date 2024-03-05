@@ -36,8 +36,8 @@ public class GyroSwerveDriveCommand extends Command {
       BooleanSupplier triggerPressR,
       BooleanSupplier triggerPressL,
       ADIS16470_IMU imu,
-      GyroSwerveDrive gyroSwerveDrive,
-      XboxController driveStick) {
+      GyroSwerveDrive gyroSwerveDrive
+      ) {
     this.dX = dX;
     this.dY = dY;
     this.dZ = dZ;
@@ -45,7 +45,6 @@ public class GyroSwerveDriveCommand extends Command {
     this.povHat = povHat;
     m_gyro = imu;
     drivetrain = gyroSwerveDrive;
-    this.driveStick = driveStick;
     turnController.reset();
     turnController.setIntegratorRange(-0.2, 0.2);
     turnController.enableContinuousInput(0.0, 360.0);
@@ -64,9 +63,11 @@ public class GyroSwerveDriveCommand extends Command {
 
   @Override
   public void execute() {
+    double getY = drivetrain.getPose().getY();
+    double getX = drivetrain.getPose().getX();
     setAngle = Math.atan2(applyDeadzone(dZ.getAsDouble(), Constants.JOYSTICK_Z_DEADZONE), applyDeadzone(dZ2.getAsDouble(), Constants.JOYSTICK_Z2_DEADZONE)) / Math.PI * 180.0;
-    if(triggerPressR.getAsBoolean()){setAngle = -Math.toDegrees(Math.atan2(drivetrain.getPose().getY() - 5.45, drivetrain.getPose().getX()));}
-    if(triggerPressL.getAsBoolean()){setAngle = -Math.toDegrees(Math.atan2(drivetrain.getPose().getX() - 7.8, drivetrain.getPose().getY() - 1.78));}
+    if(triggerPressR.getAsBoolean()){setAngle = -Math.toDegrees(Math.atan2(getY - 5.45, getX));}
+    if(triggerPressL.getAsBoolean()){setAngle = -Math.toDegrees(Math.atan2(getX - 7.8, getY - 1.78));}
     //if(triggerPressL){setAngle = Math.atan2(applyDeadzone(dZ.getAsDouble(), Constants.JOYSTICK_Z_DEADZONE), applyDeadzone(dZ2.getAsDouble(), Constants.JOYSTICK_Z2_DEADZONE)) / Math.PI * 180.0;}
 
     driveHeading = triggerPressR.getAsBoolean() || triggerPressL.getAsBoolean() || (0.75 < Math.sqrt(dZ.getAsDouble() * dZ.getAsDouble() + dZ2.getAsDouble() * dZ2.getAsDouble()));

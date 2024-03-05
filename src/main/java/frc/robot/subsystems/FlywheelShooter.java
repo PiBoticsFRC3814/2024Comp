@@ -11,6 +11,7 @@ import frc.robot.Constants;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 public class FlywheelShooter extends SubsystemBase {
@@ -22,6 +23,7 @@ public class FlywheelShooter extends SubsystemBase {
   public RelativeEncoder speed;
   public FlywheelShooter() {
     topShooter = new CANSparkMax(Constants.TOP_SHOOT_ID, MotorType.kBrushless);
+    topShooter.setIdleMode(IdleMode.kBrake);
     topPIDShoot = topShooter.getPIDController();
 		topPIDShoot.setP(Constants.SHOOT_PID[0][0]);
 		topPIDShoot.setI(Constants.SHOOT_PID[0][1]);
@@ -33,6 +35,7 @@ public class FlywheelShooter extends SubsystemBase {
     topShooter.setInverted(true);
 
     botShooter = new CANSparkMax(Constants.BOT_SHOOT_ID, MotorType.kBrushless);
+    botShooter.setIdleMode(IdleMode.kBrake);
     botPIDShoot = botShooter.getPIDController();
 		botPIDShoot.setP(Constants.SHOOT_PID[1][0]);
 		botPIDShoot.setI(Constants.SHOOT_PID[1][1]);

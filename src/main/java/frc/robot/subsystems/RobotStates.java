@@ -13,12 +13,16 @@ public class RobotStates extends SubsystemBase {
   public int moveFromLastAlign;
   public boolean autonomous;
   public double driveMultiplier;
+  public double speakSpeed;
+  public double ampSpeed;
 
   public RobotStates() {
     inFrontOfCubeStation = false;
     moveFromLastAlign = 0;
     autonomous = false;
     driveMultiplier = Constants.SLOW_SPEED;
+    speakSpeed = 4500;
+    ampSpeed = 1750;
   }
 
   @Override
