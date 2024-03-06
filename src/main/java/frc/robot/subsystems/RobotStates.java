@@ -15,6 +15,8 @@ public class RobotStates extends SubsystemBase {
   public double driveMultiplier;
   public double speakSpeed;
   public double ampSpeed;
+  public boolean inAmp;
+  public boolean inSpeaker;
 
   public RobotStates() {
     inFrontOfCubeStation = false;
@@ -23,6 +25,8 @@ public class RobotStates extends SubsystemBase {
     driveMultiplier = Constants.SLOW_SPEED;
     speakSpeed = 4500;
     ampSpeed = 1750;
+    inAmp = true;
+    inSpeaker = true;
   }
 
   @Override

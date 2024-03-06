@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.LimelightHelpers;
 
 public class GyroSwerveDrive extends SubsystemBase {
   private double[] speed = {0.0, 0.0, 0.0, 0.0};
@@ -57,8 +58,9 @@ public class GyroSwerveDrive extends SubsystemBase {
       kinematics, 
       Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis())),
        getModulePositions(),
-        new Pose2d()
-        );
+        new Pose2d(),
+          VecBuilder.fill(0.005, 0.005, 0.05),
+            VecBuilder.fill(0.02, 0.02, 0.1));
 
     trustVision = false;
 
@@ -68,8 +70,8 @@ public class GyroSwerveDrive extends SubsystemBase {
       this::getSpeeds,
       this::driveUnits,
       new HolonomicPathFollowerConfig(
-        new PIDConstants(2.0, 0, 0.1),
-        new PIDConstants(2.0, 0, 0.1),
+        new PIDConstants(2.0, 0.0, 0.1),
+        new PIDConstants(1.8, 0.0, 0.02),
         Constants.MAX_DRIVETRAIN_SPEED * Constants.DRIVE_POSITION_CONVERSION / 60.0,
         0.29,
         new ReplanningConfig()
@@ -97,13 +99,33 @@ public class GyroSwerveDrive extends SubsystemBase {
 
   @Override
   public void periodic() {
-    poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(1.0, 1.0, Units.degreesToRadians(20)));
+    if(LimelightHelpers.getTV("limelight")){
+      LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+      if(limelightMeasurement.tagCount > 1 || limelightMeasurement.avgTagDist <= 2)updateVisionPoseEstimator(limelightMeasurement.pose, limelightMeasurement.timestampSeconds, limelightMeasurement.tagCount);
+    }
     poseEstimator.updateWithTime(
       Timer.getFPGATimestamp(),
        Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis())),
         getModulePositions()
     );
-    
+
+    double ampdistance = (Math.sqrt(Math.pow(Math.abs(getPose().getX()) - 1.65,2.0) + Math.pow(getPose().getY() - 7.61,2.0)) * 1000.0 / 25.4);
+    //values from linear regression given datapoints causes I'm too lazy
+    //0 1750
+    //3 1800
+    //6 1900
+    //12 2000
+    ampdistance = ampdistance >= 0.0 ? ampdistance : 0.0;
+    m_RobotStates.inAmp = ampdistance <= 12;
+    m_RobotStates.ampSpeed = (ampdistance >= 1.0 ? 740.16 * Math.log(186.236 * ampdistance + 5334.16) - 4607.85 : 1750.0);
+    double Speakerdistance = 325 - Math.sqrt(Math.pow(Math.abs(getPose().getX()) - 8.308975,2.0) + Math.pow(getPose().getY() - 1.442593,2.0)) * 1000 / 25.4;
+    //values from linear regression given datapoints causes I'm too lazy
+    //28 3650 -0.1
+    //10 3900 -0.1
+    //0 4500 0.0
+    Speakerdistance = Speakerdistance >= 0.0 ? Speakerdistance : 0.0;
+    m_RobotStates.inSpeaker = Speakerdistance <= 24;
+    m_RobotStates.speakSpeed = Speakerdistance >= 3 ? 1.08 * (-259.36 * Math.log(0.00721146 * (Speakerdistance) + 0.00791717) + 3245.03) : 4500;
   }
 
   public Pose2d getPose(){
@@ -135,9 +157,13 @@ public class GyroSwerveDrive extends SubsystemBase {
     poseEstimator.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), getPose());
   }
 
-  public void updateVisionPoseEstimator(Pose2d visionEstimate, double timestamp){
+  public void updateVisionPoseEstimator(Pose2d visionEstimate, double timestamp, int tagNumber){
     //ramp measurement trust based on robot distance
     //poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.1 * Math.pow(15, distance), 0.1 * Math.pow(15, distance), Units.degreesToRadians(20)));
+    if(tagNumber == 1)poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.8,.8, Math.toRadians(20)));
+    if(tagNumber > 1)poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.1,.1,Math.toRadians(5)));
+    //0.04 0.04 5
+    //0.8 0.8 20
     poseEstimator.addVisionMeasurement(visionEstimate, timestamp);
   }
 
@@ -150,12 +176,12 @@ public class GyroSwerveDrive extends SubsystemBase {
   public void alteredGyroDrive(double dX, double dY, double dZ, double gyroAngle){
     dX = -applyDeadzone(dX, Constants.JOYSTICK_X_DEADZONE);
     dY = -applyDeadzone(dY, Constants.JOYSTICK_Y_DEADZONE);
-    dZ = -applyDeadzone(dZ, Constants.JOYSTICK_Z_DEADZONE);
+    //dZ = -applyDeadzone(dZ, Constants.JOYSTICK_Z_DEADZONE);
     if ((dX != 0.0) || (dY != 0.0) || (dZ != 0.0)) {
       gyroDrive(
          dX * m_RobotStates.driveMultiplier,
          dY * m_RobotStates.driveMultiplier,
-         dZ,
+         -dZ,
           gyroAngle
       );
       m_RobotStates.inFrontOfCubeStation = false;

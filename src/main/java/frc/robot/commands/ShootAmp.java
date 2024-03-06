@@ -19,13 +19,12 @@ public class ShootAmp extends Command {
   Timer timer;
   RobotStates robotState;
   GyroSwerveDrive drivetrain;
-  public ShootAmp(FlywheelShooter shooter, Intake intake, RobotStates robotState, GyroSwerveDrive drivetrain) {
+  public ShootAmp(FlywheelShooter shooter, Intake intake, RobotStates robotState) {
     this.shooter = shooter;
     this.intake = intake;
     timer = new Timer();
     this.robotState = robotState;
-    this.drivetrain = drivetrain;
-    addRequirements(shooter, intake, robotState, drivetrain);
+    addRequirements(shooter, intake);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -42,17 +41,9 @@ public class ShootAmp extends Command {
 
   @Override
   public void execute() {
-    float distance = (float) (230 - Math.sqrt(Math.pow(Math.abs((float)drivetrain.getPose().getX()) - 6.429375f,2.0f) + Math.pow((float)drivetrain.getPose().getY() - 4.098925f,2.0f)) * 1000.0f / 25.4f);
-    //values from linear regression given datapoints causes I'm too lazy
-    //0 1750
-    //3 1800
-    //6 1900
-    //12 2000
-    distance = distance >= 0.0f ? distance : 0.0f;
-    double speed = (double)(distance >= 1.0f ? 740.16f * Math.log(186.236f * distance + 5334.16f) - 4607.85f : 1700.0f);
-    if(timer.get() >= 0.3) shooter.fireDifference(speed, 0.30);
-    if(((!intake.gotNote) && (shooter.speed.getVelocity() <= speed)) || timer.get() >= 0.3) intake.stop();
-    if(shooter.speed.getVelocity() >= speed) intake.shoot();
+    if(timer.get() >= 0.3) shooter.fireDifference(robotState.ampSpeed, 0.20);
+    if(((!intake.gotNote) && (shooter.speed.getVelocity() <= robotState.ampSpeed)) || timer.get() >= 0.3) intake.stop();
+    if(shooter.speed.getVelocity() >= robotState.ampSpeed) intake.shoot();
   }
 
   // Called once the command ends or is interrupted.

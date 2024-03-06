@@ -1,6 +1,12 @@
 {
   "version": 1.0,
-  "startingPose": null,
+  "startingPose": {
+    "position": {
+      "x": 1.3479282065452507,
+      "y": 5.47936411787313
+    },
+    "rotation": 0
+  },
   "command": {
     "type": "sequential",
     "data": {
@@ -37,15 +43,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Middle Return"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SpeakerFire"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Middle Return"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpeakerFire"
+                }
+              }
+            ]
           }
         },
         {
@@ -102,6 +115,37 @@
           "type": "path",
           "data": {
             "pathName": "Amp Return"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerFire"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Far Mid Pickup"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeRun"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Far Mid Return"
           }
         },
         {
