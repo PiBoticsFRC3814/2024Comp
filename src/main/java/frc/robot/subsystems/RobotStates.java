@@ -14,6 +14,7 @@ public class RobotStates extends SubsystemBase {
   public boolean autonomous;
   public double driveMultiplier;
   public double speakSpeed;
+  public double speakDist;
   public double ampSpeed;
   public boolean inAmp;
   public boolean inSpeaker;
@@ -27,6 +28,7 @@ public class RobotStates extends SubsystemBase {
     ampSpeed = 1750;
     inAmp = true;
     inSpeaker = true;
+
   }
 
   @Override

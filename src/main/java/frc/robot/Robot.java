@@ -99,7 +99,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Gyro", m_robotContainer.m_gyro.getAngle(m_robotContainer.m_gyro.getYawAxis()));
     SmartDashboard.putBoolean("Note", m_robotContainer.m_intake.gotNote);
     //SmartDashboard.putNumber("speakerAngle", Math.toDegrees(Math.atan2(m_robotContainer.m_gyroSwerveDrive.getPose().getY() - 5.56, m_robotContainer.m_gyroSwerveDrive.getPose().getX())));
-    //SmartDashboard.putNumber("ampDist", Math.sqrt(Math.pow(Math.abs(m_robotContainer.m_gyroSwerveDrive.getPose().getX()) - 1.65,2.0) + Math.pow(m_robotContainer.m_gyroSwerveDrive.getPose().getY() - 7.61,2.0)) * 1000.0 / 25.4);
+    SmartDashboard.putNumber("ampSpeed", m_robotContainer.m_robotStates.ampSpeed);
+    SmartDashboard.putNumber("ampDist", m_robotContainer.m_robotStates.speakDist);
     //SmartDashboard.putNumber("Voltage", m_pdp.getVoltage());
   }
 

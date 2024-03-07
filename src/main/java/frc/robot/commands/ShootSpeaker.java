@@ -45,8 +45,8 @@ public class ShootSpeaker extends Command {
   @Override
   public void execute() {
     if(timer.get() >= 0.5) shooter.fireDifference(robotState.speakSpeed, robotState.speakSpeed >= 4200 ? 0.0 : -0.1);
-    if(((!intake.gotNote) || timer.get() >= 0.3) && shooter.speed.getVelocity() <= robotState.speakSpeed) intake.stop();
-    if((shooter.speed.getVelocity() >= (robotState.speakSpeed - robotState.speakSpeed * 0.1) * 0.9)) intake.shoot();
+    if(((!intake.gotNote) || timer.get() >= 0.2) && shooter.speed.getVelocity() <= robotState.speakSpeed) intake.stop();
+    if((shooter.speed.getVelocity() >= (robotState.speakSpeed - robotState.speakSpeed * 0.1) * 0.9) && (!robotState.autonomous || robotState.inSpeaker)) intake.shoot();
   }
 
   // Called once the command ends or is interrupted.

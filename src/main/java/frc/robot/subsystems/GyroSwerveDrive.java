@@ -109,7 +109,8 @@ public class GyroSwerveDrive extends SubsystemBase {
         getModulePositions()
     );
 
-    double ampdistance = (Math.sqrt(Math.pow(Math.abs(getPose().getX()) - 1.65,2.0) + Math.pow(getPose().getY() - 7.61,2.0)) * 1000.0 / 25.4);
+    double ampdistance = (Math.sqrt(Math.pow(Math.abs(getPose().getX()) - 1.65,2.0) + Math.pow(getPose().getY() - 7.54,2.0)) * 1000.0 / 25.4);
+    m_RobotStates.speakDist = ampdistance;
     //values from linear regression given datapoints causes I'm too lazy
     //0 1750
     //3 1800
@@ -160,8 +161,8 @@ public class GyroSwerveDrive extends SubsystemBase {
   public void updateVisionPoseEstimator(Pose2d visionEstimate, double timestamp, int tagNumber){
     //ramp measurement trust based on robot distance
     //poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.1 * Math.pow(15, distance), 0.1 * Math.pow(15, distance), Units.degreesToRadians(20)));
-    if(tagNumber == 1)poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.8,.8, Math.toRadians(20)));
-    if(tagNumber > 1)poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.1,.1,Math.toRadians(5)));
+    //if(tagNumber == 1)poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.8,.8, Math.toRadians(20)));
+    //if(tagNumber > 1)poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.1,.1,Math.toRadians(5)));
     //0.04 0.04 5
     //0.8 0.8 20
     poseEstimator.addVisionMeasurement(visionEstimate, timestamp);

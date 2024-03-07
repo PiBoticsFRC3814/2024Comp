@@ -81,15 +81,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Stage Return"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SpeakerFire"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Stage Return"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpeakerFire"
+                }
+              }
+            ]
           }
         },
         {
