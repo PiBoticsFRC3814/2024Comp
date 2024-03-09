@@ -60,7 +60,7 @@ public class GyroSwerveDrive extends SubsystemBase {
        getModulePositions(),
         new Pose2d(),
           VecBuilder.fill(0.005, 0.005, 0.05),
-            VecBuilder.fill(0.02, 0.02, 0.1));
+            VecBuilder.fill(0.05, 0.05, 1.0));
 
     trustVision = false;
 
@@ -70,10 +70,10 @@ public class GyroSwerveDrive extends SubsystemBase {
       this::getSpeeds,
       this::driveUnits,
       new HolonomicPathFollowerConfig(
+        new PIDConstants(2.2, 0.0, 0.1),
         new PIDConstants(2.0, 0.0, 0.1),
-        new PIDConstants(1.8, 0.0, 0.02),
         Constants.MAX_DRIVETRAIN_SPEED * Constants.DRIVE_POSITION_CONVERSION / 60.0,
-        0.29,
+        Constants.SWERVE_RADIUS / 25.4 / 1000.0,
         new ReplanningConfig()
       ),
       () -> {

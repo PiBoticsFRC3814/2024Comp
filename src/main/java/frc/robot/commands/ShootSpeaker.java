@@ -59,6 +59,6 @@ public class ShootSpeaker extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return ((timer.get() >= 0.8 && robotState.autonomous) && !intake.gotNote);
+    return ((timer.get() >= 1.0 && robotState.autonomous) && !intake.gotNote);
   }
 }
