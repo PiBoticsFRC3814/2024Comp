@@ -5,7 +5,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.FlywheelShooter;
 import frc.robot.subsystems.GyroSwerveDrive;
@@ -41,9 +40,9 @@ public class ShootAmp extends Command {
 
   @Override
   public void execute() {
-    if(timer.get() >= 0.3) shooter.fireDifference(robotState.ampSpeed, 0.30);
+    if(timer.get() >= 0.3) shooter.fireDifference(1700, 0.30);
     if(((!intake.gotNote) && (shooter.speed.getVelocity() <= robotState.ampSpeed)) || timer.get() >= 0.3) intake.stop();
-    if(shooter.speed.getVelocity() >= robotState.ampSpeed && (!robotState.autonomous || robotState.inAmp)) intake.shoot();
+    if(shooter.speed.getVelocity() >= 1700 && (!robotState.autonomous || robotState.inAmp)) intake.shoot();
   }
 
   // Called once the command ends or is interrupted.

@@ -22,7 +22,7 @@ public class Intake extends SubsystemBase {
     sensor = new DigitalInput(9);
     intakeMotor.configPeakCurrentLimit(15);
     intakeMotor.setNeutralMode(NeutralMode.Brake);
-    intakeMotor.configVoltageCompSaturation(10);
+    intakeMotor.configVoltageCompSaturation(7);
     intakeMotor.enableVoltageCompensation(true);
   }
 

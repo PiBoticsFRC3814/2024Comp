@@ -119,15 +119,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Amp Return"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SpeakerFire"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Amp Return"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpeakerFire"
+                }
+              }
+            ]
           }
         },
         {
@@ -150,15 +157,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Far Mid Return"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SpeakerFire"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Far Mid Return"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpeakerFire"
+                }
+              }
+            ]
           }
         }
       ]

@@ -44,7 +44,7 @@ public class ShootSpeaker extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(timer.get() >= 0.5) shooter.fireDifference(robotState.speakSpeed, robotState.speakSpeed >= 4200 ? 0.0 : -0.1);
+    if(timer.get() >= 0.3) shooter.fireDifference(robotState.speakSpeed, robotState.speakSpeed >= 4200 ? 0.0 : -0.1);
     if(((!intake.gotNote) || timer.get() >= 0.2) && shooter.speed.getVelocity() <= robotState.speakSpeed) intake.stop();
     if((shooter.speed.getVelocity() >= (robotState.speakSpeed - robotState.speakSpeed * 0.1) * 0.9) && (!robotState.autonomous || robotState.inSpeaker)) intake.shoot();
   }
@@ -59,6 +59,6 @@ public class ShootSpeaker extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (timer.get() >= 1.5 && robotState.autonomous);
+    return ((timer.get() >= 0.8 && robotState.autonomous) && !intake.gotNote);
   }
 }

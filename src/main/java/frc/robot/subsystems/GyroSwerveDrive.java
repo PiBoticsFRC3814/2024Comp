@@ -101,7 +101,7 @@ public class GyroSwerveDrive extends SubsystemBase {
   public void periodic() {
     if(LimelightHelpers.getTV("limelight")){
       LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-      if(limelightMeasurement.tagCount > 1 || limelightMeasurement.avgTagDist <= 2)updateVisionPoseEstimator(limelightMeasurement.pose, limelightMeasurement.timestampSeconds, limelightMeasurement.tagCount);
+      if(limelightMeasurement.tagCount > 1 || limelightMeasurement.avgTagDist <= 1)updateVisionPoseEstimator(limelightMeasurement.pose, limelightMeasurement.timestampSeconds, limelightMeasurement.tagCount);
     }
     poseEstimator.updateWithTime(
       Timer.getFPGATimestamp(),

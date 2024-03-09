@@ -4,14 +4,22 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
+
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.RobotStates;
 
 public class IntakeRun extends Command {
   /** Creates a new IntakeRun. */
   Intake intake;
-  public IntakeRun(Intake intake) {
+  Timer timer;
+  RobotStates robotState;
+  public IntakeRun(Intake intake, RobotStates robotState) {
     this.intake = intake;
+    timer = new Timer();
+    this.robotState = robotState;
     addRequirements(intake);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -19,6 +27,8 @@ public class IntakeRun extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    timer.reset();
+    timer.start();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -34,6 +44,6 @@ public class IntakeRun extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return intake.gotNote;
+    return intake.gotNote || (robotState.autonomous && timer.get() >= 4.0);
   }
 }

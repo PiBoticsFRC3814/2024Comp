@@ -84,7 +84,7 @@ public class RobotContainer {
     double speed = 1300;//SmartDashboard.getNumber("Speed", 0.0);
     //m_shooter.setDefaultCommand(new ShootWithSlider(m_shooter, () -> speed, () -> m_driverController.getThrottle()));
 
-    NamedCommands.registerCommand("intakeRun", new IntakeRun(m_intake));
+    NamedCommands.registerCommand("intakeRun", new IntakeRun(m_intake, m_robotStates));
     NamedCommands.registerCommand("intakeStop", new IntakeStop(m_intake));
     NamedCommands.registerCommand("SpeakerFire", new ShootSpeaker(m_shooter, m_intake, m_robotStates));
     NamedCommands.registerCommand("shootAmp", new ShootAmp(m_shooter, m_intake, m_robotStates));
@@ -107,7 +107,7 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new JoystickButton(controlStick, Button.kRightBumper.value).whileTrue(new IntakeRun(m_intake));
+    new JoystickButton(controlStick, Button.kRightBumper.value).whileTrue(new IntakeRun(m_intake, m_robotStates));
     //new JoystickButton(controlStick, Button.kRightBumper.value).whileFalse(new IntakeStop(m_intake));
     new JoystickButton(controlStick, Button.kLeftBumper.value).whileTrue(new Outake(m_intake));
     new JoystickButton(driveStick, Button.kX.value).whileTrue(new GyroReset(m_gyro, m_gyroSwerveDrive));
