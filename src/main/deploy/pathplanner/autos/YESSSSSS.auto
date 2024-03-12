@@ -159,14 +159,14 @@
                 "data": {
                   "pathName": "Far Mid Return"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpeakerFire"
+                }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SpeakerFire"
           }
         }
       ]

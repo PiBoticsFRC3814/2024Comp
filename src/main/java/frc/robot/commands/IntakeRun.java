@@ -15,10 +15,12 @@ public class IntakeRun extends Command {
   /** Creates a new IntakeRun. */
   Intake intake;
   Timer timer;
+  Timer timeOut;
   RobotStates robotState;
   public IntakeRun(Intake intake, RobotStates robotState) {
     this.intake = intake;
     timer = new Timer();
+    timeOut = new Timer();
     this.robotState = robotState;
     addRequirements(intake);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -28,12 +30,16 @@ public class IntakeRun extends Command {
   @Override
   public void initialize() {
     timer.reset();
-    timer.start();
+    timeOut.reset();
+    timeOut.start();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {intake.intake();}
+  public void execute() {
+    intake.intake();
+    if(intake.gotNote) timer.start();
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -44,6 +50,6 @@ public class IntakeRun extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return intake.gotNote || (robotState.autonomous && timer.get() >= 4.0);
+    return ((intake.gotNote && (timer.get() >= 0.2)) || (robotState.autonomous && timeOut.get() >= 4.0));
   }
 }

@@ -17,6 +17,7 @@ public class ShootSpeaker extends Command {
   private FlywheelShooter shooter;
   private Intake intake;
   Timer timer;
+  Timer timeOut;
   private int count;
   RobotStates robotState;
   double speed;
@@ -25,6 +26,7 @@ public class ShootSpeaker extends Command {
     this.shooter = shooter;
     this.intake = intake;
     timer = new Timer();
+    timeOut = new Timer();
     this.robotState = robotState;
     addRequirements(shooter, intake, robotState);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -35,6 +37,7 @@ public class ShootSpeaker extends Command {
   public void initialize() {
     timer.reset();
     timer.start();
+    timeOut.reset();
     intake.outtakeShoot();
     intake.brake();
     count = 0;
@@ -46,7 +49,10 @@ public class ShootSpeaker extends Command {
   public void execute() {
     if(timer.get() >= 0.3) shooter.fireDifference(robotState.speakSpeed, robotState.speakSpeed >= 4200 ? 0.0 : -0.1);
     if(((!intake.gotNote) || timer.get() >= 0.2) && shooter.speed.getVelocity() <= robotState.speakSpeed) intake.stop();
-    if((shooter.speed.getVelocity() >= (robotState.speakSpeed - robotState.speakSpeed * 0.1) * 0.9) && (!robotState.autonomous || robotState.inSpeaker)) intake.shoot();
+    if((shooter.speed.getVelocity() >= (robotState.speakSpeed - robotState.speakSpeed * 0.1) * 0.86) && (!robotState.autonomous || robotState.inSpeaker)){
+      timeOut.start();
+      intake.shoot();
+    }
   }
 
   // Called once the command ends or is interrupted.
@@ -59,6 +65,6 @@ public class ShootSpeaker extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return ((timer.get() >= 1.0 && robotState.autonomous) && !intake.gotNote);
+    return (timeOut.get() >= 1.1 && robotState.autonomous);
   }
 }

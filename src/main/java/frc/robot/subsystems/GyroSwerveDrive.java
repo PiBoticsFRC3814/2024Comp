@@ -70,7 +70,7 @@ public class GyroSwerveDrive extends SubsystemBase {
       this::getSpeeds,
       this::driveUnits,
       new HolonomicPathFollowerConfig(
-        new PIDConstants(2.2, 0.0, 0.1),
+        new PIDConstants(2.4, 0.0, 0.1),
         new PIDConstants(2.0, 0.0, 0.1),
         Constants.MAX_DRIVETRAIN_SPEED * Constants.DRIVE_POSITION_CONVERSION / 60.0,
         Constants.SWERVE_RADIUS / 25.4 / 1000.0,

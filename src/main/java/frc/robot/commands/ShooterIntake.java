@@ -23,7 +23,7 @@ public class ShooterIntake extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    shooter.fireDifference(-1000, 0);
+    shooter.fireDifference(-500, 0);
   }
 
   // Called once the command ends or is interrupted.

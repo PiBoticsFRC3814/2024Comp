@@ -40,9 +40,9 @@ public class ShootAmp extends Command {
 
   @Override
   public void execute() {
-    if(timer.get() >= 0.3) shooter.fireDifference(1700, 0.30);
-    if(((!intake.gotNote) && (shooter.speed.getVelocity() <= robotState.ampSpeed)) || timer.get() >= 0.3) intake.stop();
-    if(shooter.speed.getVelocity() >= 1700 && (!robotState.autonomous || robotState.inAmp)) intake.shoot();
+    if(timer.get() >= 0.3) shooter.fireDifference(1650, 0.30);
+    if(((!intake.gotNote) && (shooter.speed.getVelocity() <= 1650)) || timer.get() >= 0.3) intake.stop();
+    if(shooter.speed.getVelocity() >= 1650 && (!robotState.autonomous || robotState.inAmp)) intake.shoot();
   }
 
   // Called once the command ends or is interrupted.
