@@ -6,19 +6,13 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "SpeakerFire"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Amp Pickup"
+                  "pathName": "Right Right Pickup"
                 }
               },
               {
@@ -37,7 +31,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Amp Return"
+                  "pathName": "Far Right Return"
                 }
               },
               {
@@ -47,37 +41,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Far Left Left"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "intakeRun"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Copy of Far Left Return Angle"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SpeakerFire"
           }
         }
       ]

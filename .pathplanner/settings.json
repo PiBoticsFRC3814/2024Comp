@@ -4,10 +4,10 @@
   "holonomicMode": true,
   "pathFolders": [
     "Amp",
-    "Far Left",
+    "Left Left",
     "Far Mid",
-    "Middle",
     "Far Right",
+    "Middle",
     "Stage"
   ],
   "autoFolders": [],

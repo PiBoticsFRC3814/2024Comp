@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -89,7 +91,8 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.chooserFirst.getSelected();
+    m_autonomousCommand = new PathPlannerAuto("AutoShoot");
+    autonNumber = 0;
     m_autonomousCommand.isFinished();
     m_robotContainer.m_robotStates.autonomous = true;
     LimelightHelpers.setPipelineIndex("limelight", 0);
@@ -105,7 +108,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     if(m_autonomousCommand.isFinished()){
-      if(autonNumber == 1) m_autonomousCommand = m_robotContainer.chooserSecond.getSelected();
+      if(autonNumber == 1) m_autonomousCommand = m_robotContainer.chooserFirst.getSelected();
+      if(autonNumber == 2) m_autonomousCommand = m_robotContainer.chooserSecond.getSelected();
       if(autonNumber == 2) m_autonomousCommand = m_robotContainer.chooserThird.getSelected();
       autonNumber++;
       if (m_autonomousCommand != null) {

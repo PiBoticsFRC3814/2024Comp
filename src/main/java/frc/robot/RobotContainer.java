@@ -86,12 +86,35 @@ public class RobotContainer {
     NamedCommands.registerCommand("shootAmp", new ShootAmp(m_shooter, m_intake, m_robotStates));
     NamedCommands.registerCommand("gyroReset", new GyroReset(m_gyroSwerveDrive));
 
-    chooserFirst.setDefaultOption("Left", new PathPlannerAuto("Far Left Right"));
-    chooserFirst.addOption("Center", new PathPlannerAuto("Far Right Left"));
-    chooserFirst.addOption("Right", new PathPlannerAuto("YESSSSSS"));
+    chooserFirst.setDefaultOption("Nothing", new PrintCommand("firstAuton"));
+    chooserFirst.addOption("Left Left", new PathPlannerAuto("Far Left Left"));
+    chooserFirst.addOption("Left Right", new PathPlannerAuto("Left Right"));
+    chooserFirst.addOption("Right Left", new PathPlannerAuto("Far Right Left"));
+    chooserFirst.addOption("Right Right", new PathPlannerAuto("Right Right"));
+    chooserFirst.addOption("Center Far", new PathPlannerAuto("Center Far"));
+    chooserFirst.addOption("Center Close", new PathPlannerAuto("Center Close"));
+    chooserFirst.addOption("Amp", new PathPlannerAuto("Amp"));
+    chooserFirst.addOption("Stage", new PathPlannerAuto("Stage"));
 
-    chooserSecond.setDefaultOption("Value", new PrintCommand("secondAuton"));
-    chooserThird.setDefaultOption("Value", new PrintCommand("thirdAuton"));
+    chooserSecond.setDefaultOption("Nothing", new PrintCommand("secondAuton"));
+    chooserSecond.addOption("Left Left", new PathPlannerAuto("Far Left Left"));
+    chooserSecond.addOption("Left Right", new PathPlannerAuto("Left Right"));
+    chooserSecond.addOption("Right Left", new PathPlannerAuto("Far Right Left"));
+    chooserSecond.addOption("Right Right", new PathPlannerAuto("Right Right"));
+    chooserSecond.addOption("Center Far", new PathPlannerAuto("Center Far"));
+    chooserSecond.addOption("Center Close", new PathPlannerAuto("Center Close"));
+    chooserSecond.addOption("Amp", new PathPlannerAuto("Amp"));
+    chooserSecond.addOption("Stage", new PathPlannerAuto("Stage"));
+
+    chooserThird.setDefaultOption("Nothing", new PrintCommand("thirdAuton"));
+    chooserThird.addOption("Left Left", new PathPlannerAuto("Far Left Left"));
+    chooserThird.addOption("Left Right", new PathPlannerAuto("Left Right"));
+    chooserThird.addOption("Right Left", new PathPlannerAuto("Far Right Left"));
+    chooserThird.addOption("Right Right", new PathPlannerAuto("Right Right"));
+    chooserThird.addOption("Center Far", new PathPlannerAuto("Center Far"));
+    chooserThird.addOption("Center Close", new PathPlannerAuto("Center Close"));
+    chooserThird.addOption("Amp", new PathPlannerAuto("Amp"));
+    chooserThird.addOption("Stage", new PathPlannerAuto("Stage"));
 
     configureBindings();
   }
