@@ -34,7 +34,7 @@ public class SwerveModule {
 		driveMotor.setIdleMode(IdleMode.kBrake);
 		driveMotor.setInverted( Constants.DRIVE_MOTOR_INVERTED[swerveModIndex] );
 		driveMotor.setOpenLoopRampRate( 0.2 );
-		driveMotor.setSmartCurrentLimit(50, 40);
+		driveMotor.setSmartCurrentLimit(50, 55);
 
 		driveVelocityPIDController = driveMotor.getPIDController();
 		driveVelocityPIDController.setP(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][0]);

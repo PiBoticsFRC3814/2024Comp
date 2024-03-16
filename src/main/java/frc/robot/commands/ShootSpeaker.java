@@ -16,17 +16,16 @@ public class ShootSpeaker extends Command {
   /** Creates a new ShootAmp. */
   private FlywheelShooter shooter;
   private Intake intake;
-  Timer timer;
-  Timer timeOut;
+  Timer timerSpeak;
   private int count;
   RobotStates robotState;
   double speed;
   GyroSwerveDrive drivetrain;
+  double timeSinceShoot;
   public ShootSpeaker(FlywheelShooter shooter, Intake intake, RobotStates robotState) {
     this.shooter = shooter;
     this.intake = intake;
-    timer = new Timer();
-    timeOut = new Timer();
+    timerSpeak = new Timer();
     this.robotState = robotState;
     addRequirements(shooter, intake, robotState);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -35,24 +34,27 @@ public class ShootSpeaker extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    timer.reset();
-    timer.start();
-    timeOut.reset();
+    timerSpeak.reset();
+    timerSpeak.start();
     intake.outtakeShoot();
     intake.brake();
     count = 0;
+    timeSinceShoot = 0;
     //speed = 4100;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(timer.get() >= 0.3) shooter.fireDifference(robotState.speakSpeed, robotState.speakSpeed >= 4200 ? 0.0 : -0.1);
-    if(((!intake.gotNote) || timer.get() >= 0.2) && shooter.speed.getVelocity() <= robotState.speakSpeed) intake.stop();
-    if((shooter.speed.getVelocity() >= (robotState.speakSpeed - robotState.speakSpeed * 0.1) * 0.86) && (!robotState.autonomous || robotState.inSpeaker)){
-      timeOut.start();
+    if(timerSpeak.get() >= 0.3) shooter.fireDifference(robotState.speakSpeed, robotState.speakSpeed >= 4000 ? 0.0 : -0.1);
+    if(((!intake.gotNote) || timerSpeak.get() >= 0.3) && shooter.speed.getVelocity() <= (robotState.speakSpeed - robotState.speakSpeed * 0.1) * 0.95){
+      intake.stop();
+    }
+    if((shooter.speed.getVelocity() >= (robotState.speakSpeed - robotState.speakSpeed * 0.1) * 0.95) && (!robotState.autonomous || robotState.inSpeaker)){
+      if(timeSinceShoot == 0) timeSinceShoot = Timer.getFPGATimestamp();
       intake.shoot();
     }
+    System.out.println(Timer.getFPGATimestamp() - timeSinceShoot);
   }
 
   // Called once the command ends or is interrupted.
@@ -65,6 +67,6 @@ public class ShootSpeaker extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (timeOut.get() >= 1.1 && robotState.autonomous);
+    return (((Timer.getFPGATimestamp() - timeSinceShoot >= 1.3) && timeSinceShoot > 0) && robotState.autonomous);
   }
 }

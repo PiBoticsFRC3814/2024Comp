@@ -4,16 +4,17 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.FlywheelShooter;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.GyroSwerveDrive;
 
-public class ShooterIntake extends Command {
-  /** Creates a new ShooterIntake. */
-  FlywheelShooter shooter;
-  public ShooterIntake(FlywheelShooter shooter) {
-    this.shooter = shooter;
-    addRequirements(shooter);
+public class Brake extends CommandBase {
+  /** Creates a new HardBrake. */
+  GyroSwerveDrive m_drive;
+
+  public Brake(GyroSwerveDrive tempDrive) {
     // Use addRequirements() here to declare subsystem dependencies.
+    m_drive = tempDrive;
+    addRequirements(tempDrive);
   }
 
   // Called when the command is initially scheduled.
@@ -23,18 +24,16 @@ public class ShooterIntake extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    shooter.fireDifference(-1000, 0);
+    m_drive.brakeAngle();
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    shooter.stopShooter();
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

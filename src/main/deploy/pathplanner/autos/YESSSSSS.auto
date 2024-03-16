@@ -8,13 +8,13 @@
         {
           "type": "named",
           "data": {
-            "name": "gyroRest"
+            "name": "SpeakerFire"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "SpeakerFire"
+            "name": "gyroReset"
           }
         },
         {

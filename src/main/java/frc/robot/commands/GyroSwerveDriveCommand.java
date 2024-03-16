@@ -72,7 +72,6 @@ public class GyroSwerveDriveCommand extends Command {
 
     driveHeading = triggerPressR.getAsBoolean() || triggerPressL.getAsBoolean() || (0.75 < Math.sqrt(dZ.getAsDouble() * dZ.getAsDouble() + dZ2.getAsDouble() * dZ2.getAsDouble()));
     setAngle = setAngle < 0.0 ? 360 + setAngle : setAngle;
-    System.out.println(setAngle);
     if(driveHeading){
       headingCorrection =  MathUtil.clamp(turnController.calculate(360.0 - (m_gyro.getAngle(m_gyro.getYawAxis()) % 360.0), setAngle), -1.0, 1.0);
     }

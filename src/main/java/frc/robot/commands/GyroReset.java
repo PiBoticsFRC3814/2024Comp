@@ -11,12 +11,10 @@ import frc.robot.subsystems.GyroSwerveDrive;
 
 public class GyroReset extends Command {
   /** Creates a new GyroReset. */
-  ADIS16470_IMU gyro;
   GyroSwerveDrive drivetrain;
 
-  public GyroReset(ADIS16470_IMU gyro, GyroSwerveDrive drivetrain) {
+  public GyroReset(GyroSwerveDrive drivetrain) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.gyro = gyro;
     this.drivetrain = drivetrain;
   }
 
@@ -28,8 +26,7 @@ public class GyroReset extends Command {
   @Override
   public void execute() {
     drivetrain.drive(0.0, 0.0, 0.0);
-    gyro.reset();
-    drivetrain.resetOdometry(new Pose2d());
+    drivetrain.resetGyro();
     System.err.println("gyro reset");
   }
 

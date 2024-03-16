@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -58,6 +59,10 @@ public class RobotContainer {
   public final GyroSwerveDrive m_gyroSwerveDrive = new GyroSwerveDrive(m_robotStates, m_gyro);
   public final Climber m_climber = new Climber();
 
+  public SendableChooser<Command> chooserFirst = new SendableChooser<>();
+  public SendableChooser<Command> chooserSecond = new SendableChooser<>();
+  public SendableChooser<Command> chooserThird = new SendableChooser<>();
+
   // Replace with CommandPS4Controller or CommandJoystick if needed
   XboxController driveStick = new XboxController(2);
   XboxController controlStick = new XboxController(1);
@@ -65,17 +70,6 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     //*
-    m_gyroSwerveDrive.setDefaultCommand(
-        new GyroSwerveDriveCommand(
-            () -> driveStick.getLeftX(),
-            () -> driveStick.getLeftY(),
-            () -> driveStick.getRightX(),
-            () -> -driveStick.getRightY(),
-            () -> driveStick.getPOV(0),
-            () -> driveStick.getRightTriggerAxis() >= 0.8,
-            () -> driveStick.getLeftTriggerAxis() >= 0.8,
-            m_gyro,
-            m_gyroSwerveDrive));
 
     m_climber.setDefaultCommand(
       new ClimbMaunal(m_climber, () -> -controlStick.getRightY(), () -> controlStick.getLeftY())
@@ -90,7 +84,15 @@ public class RobotContainer {
     NamedCommands.registerCommand("intakeStop", new IntakeStop(m_intake));
     NamedCommands.registerCommand("SpeakerFire", new ShootSpeaker(m_shooter, m_intake, m_robotStates));
     NamedCommands.registerCommand("shootAmp", new ShootAmp(m_shooter, m_intake, m_robotStates));
-    NamedCommands.registerCommand("gyroRest", new GyroReset(m_gyro, m_gyroSwerveDrive));
+    NamedCommands.registerCommand("gyroReset", new GyroReset(m_gyroSwerveDrive));
+
+    chooserFirst.setDefaultOption("Left", new PathPlannerAuto("Far Left Right"));
+    chooserFirst.addOption("Center", new PathPlannerAuto("Far Right Left"));
+    chooserFirst.addOption("Right", new PathPlannerAuto("YESSSSSS"));
+
+    chooserSecond.setDefaultOption("Value", new PrintCommand("secondAuton"));
+    chooserThird.setDefaultOption("Value", new PrintCommand("thirdAuton"));
+
     configureBindings();
   }
 
@@ -110,7 +112,7 @@ public class RobotContainer {
     new JoystickButton(controlStick, Button.kRightBumper.value).whileTrue(new IntakeRun(m_intake, m_robotStates));
     //new JoystickButton(controlStick, Button.kRightBumper.value).whileFalse(new IntakeStop(m_intake));
     new JoystickButton(controlStick, Button.kLeftBumper.value).whileTrue(new Outake(m_intake));
-    new JoystickButton(driveStick, Button.kX.value).whileTrue(new GyroReset(m_gyro, m_gyroSwerveDrive));
+    new JoystickButton(driveStick, Button.kX.value).whileTrue(new GyroReset(m_gyroSwerveDrive));
     new JoystickButton(controlStick, Button.kX.value).whileTrue(new ShootAmp(m_shooter, m_intake, m_robotStates));
     new JoystickButton(controlStick, Button.kB.value).whileTrue(new ShootSpeaker(m_shooter, m_intake, m_robotStates));
     new JoystickButton(driveStick, Button.kRightBumper.value).whileTrue(new DriveFast(m_robotStates));
@@ -124,8 +126,18 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
+  public Command getAutonomousCommand1() {
     // An example command will be run in autonomous
-    return new PathPlannerAuto("YESSSSSS");
+    return chooserFirst.getSelected();
+  }
+  
+  public Command getAutonomousCommand2() {
+    // An example command will be run in autonomous
+    return chooserSecond.getSelected();
+  }
+  
+  public Command getAutonomousCommand3() {
+    // An example command will be run in autonomous
+    return chooserThird.getSelected();
   }
 }

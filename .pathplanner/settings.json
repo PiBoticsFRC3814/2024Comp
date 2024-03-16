@@ -11,9 +11,9 @@
     "Stage"
   ],
   "autoFolders": [],
-  "defaultMaxVel": 4.16,
-  "defaultMaxAccel": 7.0,
-  "defaultMaxAngVel": 540.0,
-  "defaultMaxAngAccel": 720.0,
-  "maxModuleSpeed": 4.16
+  "defaultMaxVel": 3.71,
+  "defaultMaxAccel": 6.5,
+  "defaultMaxAngVel": 200.0,
+  "defaultMaxAngAccel": 360.0,
+  "maxModuleSpeed": 3.71
 }

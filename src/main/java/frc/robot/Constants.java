@@ -19,7 +19,7 @@ public final class Constants {
 
   public static final int DRIVE_CONTROLLER_PORT = 2;
   public static final int STEER_CONTROLLER_PORT = 0;
-  public static final double SLOW_SPEED = 0.7;
+  public static final double SLOW_SPEED = 0.5;
   public static final double FAST_SPEED = 1.0;
 
   public static final double AUTON_1_DISTANCE = 1.5; //meters
@@ -30,7 +30,7 @@ public final class Constants {
 
   public static final int LIGHT_RELAY_PORT = 0; //port for Spike controlling lights
 
-  public static final double GRID_X_SETPOINT = 0.5;
+  public static final double GRID_X_SETPOINT = 0.7;
   public static final double GRID_Y_SETPOINT = 0.8;
   public static final double RIGHT_SUBSTATION_X = 0.5;
   public static final double LEFT_SUBSTATION_X = -0.5;
@@ -68,10 +68,10 @@ public final class Constants {
 
   public static double[][] SWERVE_DRIVE_PID_CONSTANTS = { 
 		// kP   kI   kD  kIz  kFF  kMn  kMx
-		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.6e-4, -1.0, 1.0 }, //Front Right
-		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.6e-4, -1.0, 1.0 }, //Rear Right
-		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.6e-4, -1.0, 1.0 }, //Rear Left
-		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.6e-4, -1.0, 1.0 }  //Front Left
+		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.7e-4, -1.0, 1.0 }, //Front Right
+		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.7e-4, -1.0, 1.0 }, //Rear Right
+		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.7e-4, -1.0, 1.0 }, //Rear Left
+		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.7e-4, -1.0, 1.0 }  //Front Left
 	};
 
   public static final double MAX_DRIVETRAIN_SPEED = 5000;

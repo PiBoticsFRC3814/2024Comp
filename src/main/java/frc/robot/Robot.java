@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -12,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.GyroSwerveDriveCommand;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -21,9 +24,14 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
+  private int autonNumber;
 
   private RobotContainer m_robotContainer;
   private final Field2d m_field = new Field2d();
+  private AddressableLED m_led;
+  private AddressableLEDBuffer m_ledBuffer;
+  // Store what the last hue of the first pixel is
+  private int m_rainbowFirstPixelHue;
   //private final PowerDistribution m_pdp = new PowerDistribution(1, ModuleType.kRev);
 
   /**
@@ -35,6 +43,22 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    m_led = new AddressableLED(9);
+
+    autonNumber = 0;
+
+    // Reuse buffer
+    // Default to a length of 60, start empty output
+    // Length is expensive to set, so only set it once, then just update data
+    m_ledBuffer = new AddressableLEDBuffer(60);
+    m_led.setLength(m_ledBuffer.getLength());
+
+    // Set the data
+    m_led.setData(m_ledBuffer);
+    m_led.start();
+    rainbow();
+    // Set the LEDs
+    m_led.setData(m_ledBuffer);
   }
 
   /**
@@ -51,6 +75,7 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    SmartDashboard.putData("First", m_robotContainer.chooserFirst);
     //SmartDashboard.putNumber("Voltage", m_pdp.getVoltage());
   }
 
@@ -64,8 +89,11 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = m_robotContainer.chooserFirst.getSelected();
+    m_autonomousCommand.isFinished();
     m_robotContainer.m_robotStates.autonomous = true;
+    LimelightHelpers.setPipelineIndex("limelight", 0);
+    m_robotContainer.m_gyroSwerveDrive.removeDefaultCommand();
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
@@ -76,6 +104,14 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
+    if(m_autonomousCommand.isFinished()){
+      if(autonNumber == 1) m_autonomousCommand = m_robotContainer.chooserSecond.getSelected();
+      if(autonNumber == 2) m_autonomousCommand = m_robotContainer.chooserThird.getSelected();
+      autonNumber++;
+      if (m_autonomousCommand != null) {
+        m_autonomousCommand.schedule();
+      }
+    }
     //SmartDashboard.putNumber("Voltage", m_pdp.getVoltage());
   }
 
@@ -88,6 +124,18 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.m_gyroSwerveDrive.setDefaultCommand(
+        new GyroSwerveDriveCommand(
+            () -> m_robotContainer.driveStick.getLeftX(),
+            () -> m_robotContainer.driveStick.getLeftY(),
+            () -> m_robotContainer.driveStick.getRightX(),
+            () -> -m_robotContainer.driveStick.getRightY(),
+            () -> m_robotContainer.driveStick.getPOV(0),
+            () -> m_robotContainer.driveStick.getRightTriggerAxis() >= 0.8,
+            () -> m_robotContainer.driveStick.getLeftTriggerAxis() >= 0.8,
+            m_robotContainer.m_gyro,
+            m_robotContainer.m_gyroSwerveDrive));
+    LimelightHelpers.setPipelineIndex("limelight", 1);
     m_robotContainer.m_robotStates.autonomous = false;
   }
 
@@ -121,4 +169,19 @@ public class Robot extends TimedRobot {
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {}
+
+  private void rainbow() {
+    // For every pixel
+    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+      // Calculate the hue - hue is easier for rainbows because the color
+      // shape is a circle so only one value needs to precess
+      final var hue = (m_rainbowFirstPixelHue + (i * 255 / m_ledBuffer.getLength())) % 255;
+      // Set the value
+      m_ledBuffer.setHSV(i, 55, 255, hue);
+    }
+    // Increase by to make the rainbow "move"
+    m_rainbowFirstPixelHue += 3;
+    // Check bounds
+    m_rainbowFirstPixelHue %= 255;
+  }
 }

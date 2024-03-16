@@ -59,8 +59,8 @@ public class GyroSwerveDrive extends SubsystemBase {
       Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis())),
        getModulePositions(),
         new Pose2d(),
-          VecBuilder.fill(0.005, 0.005, 0.05),
-            VecBuilder.fill(0.05, 0.05, 1.0));
+          VecBuilder.fill(0.01, 0.01, 0.05),
+            VecBuilder.fill(0.15, 0.15, 1.0));
 
     trustVision = false;
 
@@ -70,8 +70,8 @@ public class GyroSwerveDrive extends SubsystemBase {
       this::getSpeeds,
       this::driveUnits,
       new HolonomicPathFollowerConfig(
-        new PIDConstants(2.4, 0.0, 0.1),
-        new PIDConstants(2.0, 0.0, 0.1),
+        new PIDConstants(25, 0.2, 0.00),
+        new PIDConstants(1.4, 0.05, 2.0),
         Constants.MAX_DRIVETRAIN_SPEED * Constants.DRIVE_POSITION_CONVERSION / 60.0,
         Constants.SWERVE_RADIUS / 25.4 / 1000.0,
         new ReplanningConfig()
@@ -101,11 +101,11 @@ public class GyroSwerveDrive extends SubsystemBase {
   public void periodic() {
     if(LimelightHelpers.getTV("limelight")){
       LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-      if(limelightMeasurement.tagCount > 1 || limelightMeasurement.avgTagDist <= 1)updateVisionPoseEstimator(limelightMeasurement.pose, limelightMeasurement.timestampSeconds, limelightMeasurement.tagCount);
+      if(limelightMeasurement.avgTagDist <= 4)updateVisionPoseEstimator(limelightMeasurement.pose, limelightMeasurement.timestampSeconds, limelightMeasurement.tagCount);
     }
     poseEstimator.updateWithTime(
       Timer.getFPGATimestamp(),
-       Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis())),
+       Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis()) % 360.0),
         getModulePositions()
     );
 
@@ -119,14 +119,14 @@ public class GyroSwerveDrive extends SubsystemBase {
     ampdistance = ampdistance >= 0.0 ? ampdistance : 0.0;
     m_RobotStates.inAmp = ampdistance <= 12;
     m_RobotStates.ampSpeed = (ampdistance >= 1.0 ? 740.16 * Math.log(186.236 * ampdistance + 5334.16) - 4607.85 : 1750.0);
-    double Speakerdistance = 325 - Math.sqrt(Math.pow(Math.abs(getPose().getX()) - 8.308975,2.0) + Math.pow(getPose().getY() - 1.442593,2.0)) * 1000 / 25.4;
+    double Speakerdistance = 325 - Math.sqrt(Math.pow(Math.abs(getPose().getX() - 8.308975),2.0) + Math.pow(getPose().getY() - 1.442593,2.0)) * 1000 / 25.4;
     //values from linear regression given datapoints causes I'm too lazy
     //28 3650 -0.1
     //10 3900 -0.1
     //0 4500 0.0
     Speakerdistance = Speakerdistance >= 0.0 ? Speakerdistance : 0.0;
     m_RobotStates.inSpeaker = Speakerdistance <= 24;
-    m_RobotStates.speakSpeed = Speakerdistance >= 3 ? 1.08 * (-259.36 * Math.log(0.00721146 * (Speakerdistance) + 0.00791717) + 3245.03) : 4500;
+    m_RobotStates.speakSpeed = Speakerdistance >= 3 ? 1.01 * (-259.36 * Math.log(0.00721146 * (Speakerdistance) + 0.00791717) + 3245.03) : 4500;
   }
 
   public Pose2d getPose(){
@@ -155,7 +155,7 @@ public class GyroSwerveDrive extends SubsystemBase {
 
   public void resetGyro(){
     gyro.reset();
-    poseEstimator.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), getPose());
+    if(!m_RobotStates.autonomous)poseEstimator.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), getPose());
   }
 
   public void updateVisionPoseEstimator(Pose2d visionEstimate, double timestamp, int tagNumber){
@@ -196,7 +196,7 @@ public class GyroSwerveDrive extends SubsystemBase {
   }
 
   public void gyroDrive(double str, double fwd, double rot, double gyroAngle) {
-    double angle = gyroAngle;//poseEstimator.getEstimatedPosition().getRotation().getRadians();
+    double angle = poseEstimator.getEstimatedPosition().getRotation().getRadians();
     double intermediary = fwd * Math.cos(angle) + str * Math.sin(angle);
     str = -fwd * Math.sin(angle) + str * Math.cos(angle);
     drive(str, intermediary, rot);
