@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.GyroSwerveDriveCommand;
+import frc.robot.commands.ShootSpeaker;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -77,9 +78,9 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    SmartDashboard.putData("First Auton", m_robotContainer.chooserFirst);
-    SmartDashboard.putData("Second Auton", m_robotContainer.chooserSecond);
-    SmartDashboard.putData("Third Auton", m_robotContainer.chooserThird);
+    SmartDashboard.putData("Auton", m_robotContainer.chooserFirst);
+    //SmartDashboard.putData("Second Auton", m_robotContainer.chooserSecond);
+    //SmartDashboard.putData("Third Auton", m_robotContainer.chooserThird);
     //SmartDashboard.putNumber("Voltage", m_pdp.getVoltage());
   }
 
@@ -93,9 +94,7 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = new PathPlannerAuto("AutoShoot");
-    autonNumber = 0;
-    m_autonomousCommand.isFinished();
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     m_robotContainer.m_robotStates.autonomous = true;
     LimelightHelpers.setPipelineIndex("limelight", 0);
     m_robotContainer.m_gyroSwerveDrive.removeDefaultCommand();
@@ -106,18 +105,9 @@ public class Robot extends TimedRobot {
     }
   }
 
-  /** This function is called periodically during autonomous. */
+  /** This function is called periodically during autonomous. cut my life into pieces*/
   @Override
   public void autonomousPeriodic() {
-    if(m_autonomousCommand.isFinished()){
-      if(autonNumber == 1) m_autonomousCommand = m_robotContainer.chooserFirst.getSelected();
-      if(autonNumber == 2) m_autonomousCommand = m_robotContainer.chooserSecond.getSelected();
-      if(autonNumber == 2) m_autonomousCommand = m_robotContainer.chooserThird.getSelected();
-      autonNumber++;
-      if (m_autonomousCommand != null) {
-        m_autonomousCommand.schedule();
-      }
-    }
     //SmartDashboard.putNumber("Voltage", m_pdp.getVoltage());
   }
 

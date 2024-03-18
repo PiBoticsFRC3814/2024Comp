@@ -60,8 +60,6 @@ public class RobotContainer {
   public final Climber m_climber = new Climber();
 
   public SendableChooser<Command> chooserFirst = new SendableChooser<>();
-  public SendableChooser<Command> chooserSecond = new SendableChooser<>();
-  public SendableChooser<Command> chooserThird = new SendableChooser<>();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   XboxController driveStick = new XboxController(2);
@@ -86,35 +84,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("shootAmp", new ShootAmp(m_shooter, m_intake, m_robotStates));
     NamedCommands.registerCommand("gyroReset", new GyroReset(m_gyroSwerveDrive));
 
-    chooserFirst.setDefaultOption("Nothing", new PrintCommand("firstAuton"));
-    chooserFirst.addOption("Left Left", new PathPlannerAuto("Far Left Left"));
-    chooserFirst.addOption("Left Right", new PathPlannerAuto("Left Right"));
-    chooserFirst.addOption("Right Left", new PathPlannerAuto("Far Right Left"));
-    chooserFirst.addOption("Right Right", new PathPlannerAuto("Right Right"));
-    chooserFirst.addOption("Center Far", new PathPlannerAuto("Center Far"));
-    chooserFirst.addOption("Center Close", new PathPlannerAuto("Center Close"));
-    chooserFirst.addOption("Amp", new PathPlannerAuto("Amp"));
-    chooserFirst.addOption("Stage", new PathPlannerAuto("Stage"));
-
-    chooserSecond.setDefaultOption("Nothing", new PrintCommand("secondAuton"));
-    chooserSecond.addOption("Left Left", new PathPlannerAuto("Far Left Left"));
-    chooserSecond.addOption("Left Right", new PathPlannerAuto("Left Right"));
-    chooserSecond.addOption("Right Left", new PathPlannerAuto("Far Right Left"));
-    chooserSecond.addOption("Right Right", new PathPlannerAuto("Right Right"));
-    chooserSecond.addOption("Center Far", new PathPlannerAuto("Center Far"));
-    chooserSecond.addOption("Center Close", new PathPlannerAuto("Center Close"));
-    chooserSecond.addOption("Amp", new PathPlannerAuto("Amp"));
-    chooserSecond.addOption("Stage", new PathPlannerAuto("Stage"));
-
-    chooserThird.setDefaultOption("Nothing", new PrintCommand("thirdAuton"));
-    chooserThird.addOption("Left Left", new PathPlannerAuto("Far Left Left"));
-    chooserThird.addOption("Left Right", new PathPlannerAuto("Left Right"));
-    chooserThird.addOption("Right Left", new PathPlannerAuto("Far Right Left"));
-    chooserThird.addOption("Right Right", new PathPlannerAuto("Right Right"));
-    chooserThird.addOption("Center Far", new PathPlannerAuto("Center Far"));
-    chooserThird.addOption("Center Close", new PathPlannerAuto("Center Close"));
-    chooserThird.addOption("Amp", new PathPlannerAuto("Amp"));
-    chooserThird.addOption("Stage", new PathPlannerAuto("Stage"));
+    chooserFirst = AutoBuilder.buildAutoChooser("Center Auto");
+    //*/
 
     configureBindings();
   }
@@ -149,18 +120,8 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand1() {
+  public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     return chooserFirst.getSelected();
-  }
-  
-  public Command getAutonomousCommand2() {
-    // An example command will be run in autonomous
-    return chooserSecond.getSelected();
-  }
-  
-  public Command getAutonomousCommand3() {
-    // An example command will be run in autonomous
-    return chooserThird.getSelected();
   }
 }

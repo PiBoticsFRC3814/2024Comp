@@ -6,6 +6,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "SpeakerFire"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -32,6 +38,44 @@
                 "type": "path",
                 "data": {
                   "pathName": "Amp Return"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpeakerFire"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Far Left Left"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeRun"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Copy of Far Left Return Angle"
                 }
               },
               {

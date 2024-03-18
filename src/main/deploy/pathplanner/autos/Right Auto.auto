@@ -6,6 +6,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "SpeakerFire"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -32,6 +38,44 @@
                 "type": "path",
                 "data": {
                   "pathName": "Stage Return"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpeakerFire"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Far Right Pickup"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeRun"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Far Right Return"
                 }
               },
               {
