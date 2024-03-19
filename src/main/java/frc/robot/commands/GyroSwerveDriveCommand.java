@@ -67,7 +67,7 @@ public class GyroSwerveDriveCommand extends Command {
     double getX = drivetrain.getPose().getX();
     setAngle = Math.atan2(applyDeadzone(dZ.getAsDouble(), Constants.JOYSTICK_Z_DEADZONE), applyDeadzone(dZ2.getAsDouble(), Constants.JOYSTICK_Z2_DEADZONE)) / Math.PI * 180.0;
     if(triggerPressR.getAsBoolean()){setAngle = -Math.toDegrees(Math.atan2(getY - 5.45, getX));}
-    if(triggerPressL.getAsBoolean()){setAngle = -Math.toDegrees(Math.atan2(getX - 7.8, getY - 1.78));}
+    //if(triggerPressL.getAsBoolean()){setAngle = -Math.toDegrees(Math.atan2(getX - 7.8, getY - 1.78));}
     //if(triggerPressL){setAngle = Math.atan2(applyDeadzone(dZ.getAsDouble(), Constants.JOYSTICK_Z_DEADZONE), applyDeadzone(dZ2.getAsDouble(), Constants.JOYSTICK_Z2_DEADZONE)) / Math.PI * 180.0;}
 
     driveHeading = triggerPressR.getAsBoolean() || triggerPressL.getAsBoolean() || (0.75 < Math.sqrt(dZ.getAsDouble() * dZ.getAsDouble() + dZ2.getAsDouble() * dZ2.getAsDouble()));

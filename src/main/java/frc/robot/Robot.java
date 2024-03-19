@@ -108,6 +108,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. cut my life into pieces*/
   @Override
   public void autonomousPeriodic() {
+    if(m_autonomousCommand.isFinished()) System.out.println("AutoDone");
     //SmartDashboard.putNumber("Voltage", m_pdp.getVoltage());
   }
 

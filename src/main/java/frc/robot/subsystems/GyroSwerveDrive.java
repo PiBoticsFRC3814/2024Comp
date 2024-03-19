@@ -70,8 +70,8 @@ public class GyroSwerveDrive extends SubsystemBase {
       this::getSpeeds,
       this::driveUnits,
       new HolonomicPathFollowerConfig(
-        new PIDConstants(25, 0.2, 0.00),
-        new PIDConstants(1.4, 0.05, 2.0),
+        new PIDConstants(25, 0.1, 0.0),
+        new PIDConstants(1.4, 0.005, 1.4),
         Constants.MAX_DRIVETRAIN_SPEED * Constants.DRIVE_POSITION_CONVERSION / 60.0,
         Constants.SWERVE_RADIUS / 25.4 / 1000.0,
         new ReplanningConfig()
@@ -125,7 +125,7 @@ public class GyroSwerveDrive extends SubsystemBase {
     //10 3900 -0.1
     //0 4500 0.0
     Speakerdistance = Speakerdistance >= 0.0 ? Speakerdistance : 0.0;
-    m_RobotStates.inSpeaker = Speakerdistance <= 24;
+    m_RobotStates.inSpeaker = Speakerdistance <= 20;
     m_RobotStates.speakSpeed = Speakerdistance >= 3 ? 1.01 * (-259.36 * Math.log(0.00721146 * (Speakerdistance) + 0.00791717) + 3245.03) : 4500;
   }
 
