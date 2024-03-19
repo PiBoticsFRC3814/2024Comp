@@ -62,6 +62,7 @@ public class Robot extends TimedRobot {
     rainbow();
     // Set the LEDs
     m_led.setData(m_ledBuffer);
+    SmartDashboard.putData("Auton", m_robotContainer.chooserFirst);
   }
 
   /**
@@ -78,7 +79,6 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    SmartDashboard.putData("Auton", m_robotContainer.chooserFirst);
     //SmartDashboard.putData("Second Auton", m_robotContainer.chooserSecond);
     //SmartDashboard.putData("Third Auton", m_robotContainer.chooserThird);
     //SmartDashboard.putNumber("Voltage", m_pdp.getVoltage());

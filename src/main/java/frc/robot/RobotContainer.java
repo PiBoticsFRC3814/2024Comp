@@ -59,7 +59,7 @@ public class RobotContainer {
   public final GyroSwerveDrive m_gyroSwerveDrive = new GyroSwerveDrive(m_robotStates, m_gyro);
   public final Climber m_climber = new Climber();
 
-  public SendableChooser<Command> chooserFirst = new SendableChooser<>();
+  public SendableChooser<String> chooserFirst = new SendableChooser<>();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   XboxController driveStick = new XboxController(2);
@@ -84,7 +84,9 @@ public class RobotContainer {
     NamedCommands.registerCommand("shootAmp", new ShootAmp(m_shooter, m_intake, m_robotStates));
     NamedCommands.registerCommand("gyroReset", new GyroReset(m_gyroSwerveDrive));
 
-    chooserFirst = AutoBuilder.buildAutoChooser("Center Auto");
+    chooserFirst.setDefaultOption("Center", "Center Auto");
+    chooserFirst.addOption("Left", "Left Auto");
+    chooserFirst.addOption("Right", "Right Auto");
     //*/
 
     configureBindings();
@@ -122,6 +124,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return chooserFirst.getSelected();
+    return new PathPlannerAuto(chooserFirst.getSelected());
   }
 }
