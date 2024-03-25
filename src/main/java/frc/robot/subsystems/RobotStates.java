@@ -18,6 +18,7 @@ public class RobotStates extends SubsystemBase {
   public double ampSpeed;
   public boolean inAmp;
   public boolean inSpeaker;
+  public int gyroReset;
 
   public RobotStates() {
     inFrontOfCubeStation = false;
@@ -28,6 +29,7 @@ public class RobotStates extends SubsystemBase {
     ampSpeed = 1750;
     inAmp = true;
     inSpeaker = true;
+    gyroReset = 0;
 
   }
 

@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -46,22 +47,22 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    m_led = new AddressableLED(9);
+    //m_led = new AddressableLED(9);
 
     autonNumber = 0;
 
     // Reuse buffer
     // Default to a length of 60, start empty output
     // Length is expensive to set, so only set it once, then just update data
-    m_ledBuffer = new AddressableLEDBuffer(60);
-    m_led.setLength(m_ledBuffer.getLength());
+    //m_ledBuffer = new AddressableLEDBuffer(60);
+    //m_led.setLength(m_ledBuffer.getLength());
 
     // Set the data
-    m_led.setData(m_ledBuffer);
-    m_led.start();
-    rainbow();
+    //m_led.setData(m_ledBuffer);
+    //m_led.start();
+    //rainbow();
     // Set the LEDs
-    m_led.setData(m_ledBuffer);
+    //m_led.setData(m_ledBuffer);
     SmartDashboard.putData("Auton", m_robotContainer.chooserFirst);
   }
 
@@ -109,6 +110,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     if(m_autonomousCommand.isFinished()) System.out.println("AutoDone");
+    SmartDashboard.putNumber("shootSpeed", m_robotContainer.m_robotStates.speakSpeed);
     //SmartDashboard.putNumber("Voltage", m_pdp.getVoltage());
   }
 
@@ -144,8 +146,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Gyro", m_robotContainer.m_gyro.getAngle(m_robotContainer.m_gyro.getYawAxis()));
     SmartDashboard.putBoolean("Note", m_robotContainer.m_intake.gotNote);
     //SmartDashboard.putNumber("speakerAngle", Math.toDegrees(Math.atan2(m_robotContainer.m_gyroSwerveDrive.getPose().getY() - 5.56, m_robotContainer.m_gyroSwerveDrive.getPose().getX())));
-    SmartDashboard.putNumber("ampSpeed", m_robotContainer.m_robotStates.ampSpeed);
-    SmartDashboard.putNumber("ampDist", m_robotContainer.m_robotStates.speakDist);
+    //SmartDashboard.putNumber("ampDist", m_robotContainer.m_robotStates.speakDist);
     //SmartDashboard.putNumber("Voltage", m_pdp.getVoltage());
   }
 

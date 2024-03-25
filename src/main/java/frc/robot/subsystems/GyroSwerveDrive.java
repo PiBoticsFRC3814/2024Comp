@@ -23,6 +23,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -60,7 +61,7 @@ public class GyroSwerveDrive extends SubsystemBase {
        getModulePositions(),
         new Pose2d(),
           VecBuilder.fill(0.01, 0.01, 0.05),
-            VecBuilder.fill(0.15, 0.15, 1.0));
+            VecBuilder.fill(0.05, 0.05, 1.0));
 
     trustVision = false;
 
@@ -70,7 +71,7 @@ public class GyroSwerveDrive extends SubsystemBase {
       this::getSpeeds,
       this::driveUnits,
       new HolonomicPathFollowerConfig(
-        new PIDConstants(25, 0.1, 0.0),
+        new PIDConstants(28, 0.05, 0.0),
         new PIDConstants(1.4, 0.005, 1.4),
         Constants.MAX_DRIVETRAIN_SPEED * Constants.DRIVE_POSITION_CONVERSION / 60.0,
         Constants.SWERVE_RADIUS / 25.4 / 1000.0,
@@ -101,6 +102,9 @@ public class GyroSwerveDrive extends SubsystemBase {
   public void periodic() {
     if(LimelightHelpers.getTV("limelight")){
       LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+      if(!m_RobotStates.autonomous && DriverStation.getAlliance().get() == DriverStation.Alliance.Red){
+        limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight");
+      }
       if(limelightMeasurement.avgTagDist <= 4)updateVisionPoseEstimator(limelightMeasurement.pose, limelightMeasurement.timestampSeconds, limelightMeasurement.tagCount);
     }
     poseEstimator.updateWithTime(
@@ -119,14 +123,20 @@ public class GyroSwerveDrive extends SubsystemBase {
     ampdistance = ampdistance >= 0.0 ? ampdistance : 0.0;
     m_RobotStates.inAmp = ampdistance <= 12;
     m_RobotStates.ampSpeed = (ampdistance >= 1.0 ? 740.16 * Math.log(186.236 * ampdistance + 5334.16) - 4607.85 : 1750.0);
-    double Speakerdistance = 325 - Math.sqrt(Math.pow(Math.abs(getPose().getX() - 8.308975),2.0) + Math.pow(getPose().getY() - 1.442593,2.0)) * 1000 / 25.4;
+    double Speakerdistance;
+    try{
+      Speakerdistance = 325 - Math.sqrt(Math.pow(Math.abs(getPose().getX() - 8.308975),2.0) + Math.pow(getPose().getY() - (!m_RobotStates.autonomous && DriverStation.getAlliance().get() == DriverStation.Alliance.Red  ? -1.442593 : 1.442593),2.0)) * 1000 / 25.4;
+    } catch(Exception e){
+      Speakerdistance = 0;
+      System.out.println(e);
+    }
     //values from linear regression given datapoints causes I'm too lazy
     //28 3650 -0.1
     //10 3900 -0.1
     //0 4500 0.0
     Speakerdistance = Speakerdistance >= 0.0 ? Speakerdistance : 0.0;
     m_RobotStates.inSpeaker = Speakerdistance <= 20;
-    m_RobotStates.speakSpeed = Speakerdistance >= 3 ? 1.01 * (-259.36 * Math.log(0.00721146 * (Speakerdistance) + 0.00791717) + 3245.03) : 4500;
+    m_RobotStates.speakSpeed = Speakerdistance >= 3 ? 1.01 * (-259.36 * Math.log(0.00721146 * (Speakerdistance) + 0.00791717) + 3245.03) : 4800;
   }
 
   public Pose2d getPose(){
@@ -155,7 +165,8 @@ public class GyroSwerveDrive extends SubsystemBase {
 
   public void resetGyro(){
     gyro.reset();
-    if(!m_RobotStates.autonomous)poseEstimator.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), getPose());
+    poseEstimator.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), getPose());
+    m_RobotStates.gyroReset++;
   }
 
   public void updateVisionPoseEstimator(Pose2d visionEstimate, double timestamp, int tagNumber){
@@ -196,7 +207,7 @@ public class GyroSwerveDrive extends SubsystemBase {
   }
 
   public void gyroDrive(double str, double fwd, double rot, double gyroAngle) {
-    double angle = poseEstimator.getEstimatedPosition().getRotation().getRadians();
+    double angle = m_RobotStates.gyroReset >= 2 ? gyroAngle: poseEstimator.getEstimatedPosition().getRotation().getRadians();
     double intermediary = fwd * Math.cos(angle) + str * Math.sin(angle);
     str = -fwd * Math.sin(angle) + str * Math.cos(angle);
     drive(str, intermediary, rot);
@@ -220,7 +231,7 @@ public class GyroSwerveDrive extends SubsystemBase {
     double fwd = driveSpeeds.vxMetersPerSecond;
     double rot = driveSpeeds.omegaRadiansPerSecond;
     double meterSecToRPM = (1 / Constants.DRIVE_POSITION_CONVERSION * 60.0);
-    System.out.println(fwd);
+    //System.out.println(fwd);
     drive(str * meterSecToRPM / Constants.MAX_DRIVETRAIN_SPEED, fwd * meterSecToRPM / Constants.MAX_DRIVETRAIN_SPEED, rot);
   }
 

@@ -1,12 +1,6 @@
 {
   "version": 1.0,
-  "startingPose": {
-    "position": {
-      "x": 0.7629427135338847,
-      "y": 4.484888779753807
-    },
-    "rotation": -61.260204708311974
-  },
+  "startingPose": null,
   "command": {
     "type": "sequential",
     "data": {
@@ -24,7 +18,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Right Pickup"
+                  "pathName": "Middle Pickup"
                 }
               },
               {
@@ -43,7 +37,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Far Right Return"
+                  "pathName": "Middle Return"
                 }
               },
               {
@@ -62,7 +56,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Far Right Pickup"
+                  "pathName": "Amp Pickup"
                 }
               },
               {
@@ -79,18 +73,49 @@
           "data": {
             "commands": [
               {
+                "type": "named",
+                "data": {
+                  "name": "SpeakerFire"
+                }
+              },
+              {
                 "type": "path",
                 "data": {
-                  "pathName": "Far Right Return"
+                  "pathName": "Middle Return"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Stage Pickup"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "SpeakerFire"
+                  "name": "intakeRun"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Stage Return"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerFire"
           }
         }
       ]

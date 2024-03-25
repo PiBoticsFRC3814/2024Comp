@@ -15,6 +15,8 @@ import frc.robot.commands.IntakeRun;
 import frc.robot.commands.IntakeStop;
 import frc.robot.commands.ManualCommand;
 import frc.robot.commands.ManualIntake;
+import frc.robot.commands.ManualShoot;
+import frc.robot.commands.MaxShoot;
 import frc.robot.commands.Outake;
 import frc.robot.commands.ShootAmp;
 import frc.robot.commands.ShootSpeaker;
@@ -31,9 +33,13 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.ADIS16448_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -85,8 +91,11 @@ public class RobotContainer {
     NamedCommands.registerCommand("gyroReset", new GyroReset(m_gyroSwerveDrive));
 
     chooserFirst.setDefaultOption("Center", "Center Auto");
-    chooserFirst.addOption("Left", "Left Auto");
-    chooserFirst.addOption("Right", "Right Auto");
+    chooserFirst.addOption("Amp Side", "Left Auto");
+    chooserFirst.addOption("Stage Side", "Right Auto");
+    chooserFirst.addOption("Shoot test", "New Auto");
+    chooserFirst.addOption("Fun", "YESSSSS");
+    //setupShuffleboard();
     //*/
 
     configureBindings();
@@ -110,11 +119,35 @@ public class RobotContainer {
     new JoystickButton(controlStick, Button.kLeftBumper.value).whileTrue(new Outake(m_intake));
     new JoystickButton(driveStick, Button.kX.value).whileTrue(new GyroReset(m_gyroSwerveDrive));
     new JoystickButton(controlStick, Button.kX.value).whileTrue(new ShootAmp(m_shooter, m_intake, m_robotStates));
-    new JoystickButton(controlStick, Button.kB.value).whileTrue(new ShootSpeaker(m_shooter, m_intake, m_robotStates));
+    new JoystickButton(controlStick, 8).whileTrue(new ShootSpeaker(m_shooter, m_intake, m_robotStates));
+    new JoystickButton(controlStick, 7).whileTrue(new MaxShoot(m_shooter, m_intake, m_robotStates));
     new JoystickButton(driveStick, Button.kRightBumper.value).whileTrue(new DriveFast(m_robotStates));
     new JoystickButton(driveStick, Button.kRightBumper.value).whileFalse(new DriveSlow(m_robotStates));
     new JoystickButton(controlStick, Button.kA.value).whileTrue(new ShooterIntake(m_shooter));
     new JoystickButton(controlStick, Button.kY.value).whileTrue(new ManualIntake(m_intake));
+    new JoystickButton(controlStick, Button.kB.value).whileTrue(new ManualShoot(m_shooter, m_intake, m_robotStates));
+  }
+
+  public void setupShuffleboard(){
+    Shuffleboard.getTab("Test")
+    .add("Gyro", m_gyro.getAngle(m_gyro.getYawAxis()))
+    .withWidget(BuiltInWidgets.kGyro)
+    .withSize(2, 2)
+    .withPosition(8, 0);
+    Shuffleboard.getTab("Test")
+    .add("Auton", chooserFirst)
+    .withWidget(BuiltInWidgets.kSplitButtonChooser)
+    .withSize(3,1)
+    .withPosition(0,0);
+    Shuffleboard.getTab("Test")
+    .add("Note", m_intake.gotNote)
+    .withWidget(BuiltInWidgets.kBooleanBox)
+    .withSize(2,3)
+    .withPosition(9, 2);
+    /*Shuffleboard.getTab("Test")
+    .addCamera("Limelight", "limelight", null)
+    .withSize(4, 3)
+    .withPosition(0, 1);*/
   }
 
   /**

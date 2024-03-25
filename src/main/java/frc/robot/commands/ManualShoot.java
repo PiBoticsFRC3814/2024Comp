@@ -12,7 +12,7 @@ import frc.robot.subsystems.GyroSwerveDrive;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.RobotStates;
 
-public class ShootSpeaker extends Command {
+public class ManualShoot extends Command {
   /** Creates a new ShootAmp. */
   private FlywheelShooter shooter;
   private Intake intake;
@@ -22,7 +22,7 @@ public class ShootSpeaker extends Command {
   double speed;
   GyroSwerveDrive drivetrain;
   double timeSinceShoot;
-  public ShootSpeaker(FlywheelShooter shooter, Intake intake, RobotStates robotState) {
+  public ManualShoot(FlywheelShooter shooter, Intake intake, RobotStates robotState) {
     this.shooter = shooter;
     this.intake = intake;
     timerSpeak = new Timer();
@@ -46,11 +46,11 @@ public class ShootSpeaker extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(timerSpeak.get() >= 0.3) shooter.fireDifference(robotState.speakSpeed, robotState.speakSpeed >= 4000 ? 0.0 : -0.1);
-    if(((!intake.gotNote) || timerSpeak.get() >= 0.3) && shooter.speed.getVelocity() <= (robotState.speakSpeed - robotState.speakSpeed * 0.1) * 0.95){
+    if(timerSpeak.get() >= 0.3) shooter.fireDifference(4100, 0.0);
+    if(((!intake.gotNote) || timerSpeak.get() >= 0.3) && shooter.speed.getVelocity() <= (4100 - 4100 * 0.1) * 0.95){
       intake.stop();
     }
-    if((shooter.speed.getVelocity() >= (robotState.speakSpeed - robotState.speakSpeed * 0.1) * 0.95) && (!robotState.autonomous || robotState.inSpeaker)){
+    if((shooter.speed.getVelocity() >= (4100 - 4100 * 0.1) * 0.95) && (!robotState.autonomous || robotState.inSpeaker)){
       if(timeSinceShoot == 0) timeSinceShoot = Timer.getFPGATimestamp();
       intake.shoot();
     }
