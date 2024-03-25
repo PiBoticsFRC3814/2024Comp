@@ -25,7 +25,6 @@ public class GyroReset extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drivetrain.drive(0.0, 0.0, 0.0);
     drivetrain.resetGyro();
     System.err.println("gyro reset");
   }

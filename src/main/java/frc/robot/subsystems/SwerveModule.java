@@ -5,10 +5,14 @@ import com.ctre.phoenix6.hardware.core.CoreCANcoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -19,19 +23,22 @@ import frc.robot.Constants;
 public class SwerveModule {
 	public CANSparkMax            driveMotor;
 	private SparkPIDController driveVelocityPIDController;
+	private SparkPIDController steerPIDController;
 
 	public CANSparkMax            steerMotor;
 	private CoreCANcoder              steerAngleEncoder;
-	private PIDController         steerAnglePIDController;
+	private SimpleMotorFeedforward driveFF;
 
 	public double                 position;
 	private int 				  index;
 	public RelativeEncoder 		  driveEncoder;
+	public RelativeEncoder 		  steerEncoder;
 	
 	/* the SwerveModule subsystem */
 	public SwerveModule( int swerveModIndex ) {
 		driveMotor = new CANSparkMax( Constants.SWERVE_DRIVE_MOTOR_IDS[ swerveModIndex ], MotorType.kBrushless );
 		driveMotor.setIdleMode(IdleMode.kBrake);
+		driveMotor.enableVoltageCompensation(Constants.SWERVE_VOLT_COMP);
 		driveMotor.setInverted( Constants.DRIVE_MOTOR_INVERTED[swerveModIndex] );
 		driveMotor.setOpenLoopRampRate( 0.2 );
 		driveMotor.setSmartCurrentLimit(50, 55);
@@ -40,73 +47,101 @@ public class SwerveModule {
 		driveVelocityPIDController.setP(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][0]);
 		driveVelocityPIDController.setI(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][1]);
 		driveVelocityPIDController.setD(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][2]);
-		driveVelocityPIDController.setIZone(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][3]);
-		driveVelocityPIDController.setFF(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][4]);
+		driveVelocityPIDController.setIZone(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][3]); 
 
 		driveEncoder = driveMotor.getEncoder();
+		driveEncoder.setPositionConversionFactor(Constants.DRIVE_POSITION_CONVERSION);
+		driveEncoder.setVelocityConversionFactor(Constants.DRIVE_VELOCITY_FACTOR);
+		driveEncoder.setAverageDepth(4);
+		driveEncoder.setMeasurementPeriod(16);
+		driveFF = new SimpleMotorFeedforward(Constants.DRIVE_FF[0],Constants.DRIVE_FF[1],Constants.DRIVE_FF[2]);
+		configureCANStatusFrames(10, 20, 20, 500, 500, 200, 200, driveMotor);
+		driveMotor.burnFlash();
 		
 		steerMotor = new CANSparkMax( Constants.SWERVE_STEER_MOTOR_IDS[swerveModIndex], MotorType.kBrushless );
+		steerMotor.enableVoltageCompensation(Constants.SWERVE_VOLT_COMP);
 		steerMotor.setIdleMode(IdleMode.kCoast);
 		steerMotor.setInverted( Constants.STEER_MOTOR_INVERTED[swerveModIndex] );
 		steerMotor.setSmartCurrentLimit(50, 40);
 
+		steerPIDController = steerMotor.getPIDController();
+		steerPIDController.setP(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][0]);
+		steerPIDController.setI(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][1]);
+		steerPIDController.setD(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][2]);
+		steerPIDController.setIZone(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][3]); 
+		steerPIDController.setPositionPIDWrappingEnabled(true);
+		
+		steerEncoder = steerMotor.getEncoder();
+		steerEncoder.setPositionConversionFactor(Constants.STEER_POSITION_FACTOR);
+		steerEncoder.setVelocityConversionFactor(Constants.STEER_VELOCITY_FACTOR);
+		steerEncoder.setAverageDepth(4);
+		steerEncoder.setMeasurementPeriod(16);
+
 		steerAngleEncoder = new CANcoder( Constants.SWERVE_ENCODER_IDS[swerveModIndex] );
+		steerEncoder.setPosition(steerAngleEncoder.getAbsolutePosition().getValue());
 
-		steerAnglePIDController = new PIDController( 
-			Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][0],
-				Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][1],
-					Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][2]
-		);
-
-        // Limit the PID Controller's input range between -1.0 and 1.0 and set the input
-		// to be continuous.
-        steerAnglePIDController.enableContinuousInput( -1.0, 1.0 );
-		steerAnglePIDController.setTolerance( Constants.SWERVE_PID_TOLERANCE );
+		steerMotor.burnFlash();
 
 		index = swerveModIndex;
 	}
 
-	private static final double INVERSE_180 = 1.0 / 180.0; 
+	public void configureCANStatusFrames(
+      int CANStatus0, int CANStatus1, int CANStatus2, int CANStatus3, int CANStatus4, int CANStatus5, int CANStatus6, CANSparkMax motor)
+  {
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, CANStatus0);
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, CANStatus1);
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, CANStatus2);
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, CANStatus3);
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, CANStatus4);
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, CANStatus5);
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, CANStatus6);
+    //  https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
+  }
 
-	private double getOffsetSteerEncoderAngle(double angle) {
-		return (Math.abs(angle + Constants.SWERVE_SETPOINT_OFFSET[index]) % 360.0 - 180.0) * INVERSE_180;
-	}
+	public SwerveModuleState getState() {
+        return new SwerveModuleState(driveEncoder.getVelocity(), new Rotation2d(getStateAngle()));
+    }
 
-	public double getSteerAngle() {
-		return getOffsetSteerEncoderAngle(steerAngleEncoder.getAbsolutePosition().getValue() * 360.0);
-	}
+	public SwerveModulePosition getPosition() {
+        return new SwerveModulePosition(driveEncoder.getPosition(), new Rotation2d(getStateAngle()));
+    }
 
-	public SwerveModuleState getState(){
-		return new SwerveModuleState(driveEncoder.getVelocity() * Constants.DRIVE_POSITION_CONVERSION / 60.0, Rotation2d.fromDegrees(getSteerAngle() * 180.0));
-	}
+	public void setDesiredState(SwerveModuleState desiredState) {
+        // Optimize the reference state to avoid spinning further than 90 degrees
+        SwerveModuleState state = SwerveModuleState.optimize(desiredState, new Rotation2d(getStateAngle()));
 
-	public void resetModule(){
-		driveEncoder.setPosition(0.0);
-	}
+        driveVelocityPIDController.setReference(state.speedMetersPerSecond, ControlType.kVelocity, 0, driveFF.calculate(state.speedMetersPerSecond) * Constants.SWERVE_VOLT_COMP);
+        setReferenceAngle(state.angle.getRadians());
+    }
 
-	public SwerveModulePosition getPosition(){
-		return new SwerveModulePosition(driveEncoder.getPosition() * Constants.DRIVE_POSITION_CONVERSION, Rotation2d.fromDegrees(getSteerAngle() * 180.0));
-	}
+	public void setReferenceAngle(double referenceAngleRadians) {
+        double currentAngleRadians = steerEncoder.getPosition();
 
-	// angle and speed should be from -1.0 to 1.0, like a joystick input
-	public void drive( double speed, double angle ) {
-	    // Calculate the turning motor output from the turning PID controller.
+        double currentAngleRadiansMod = currentAngleRadians % (2.0 * Math.PI);
+        if (currentAngleRadiansMod < 0.0) {
+            currentAngleRadiansMod += 2.0 * Math.PI;
+        }
 
-		//* Delete slash for tuning offset
-		double turnOutput = steerAnglePIDController.calculate( getSteerAngle(), angle );
-		steerMotor.set( MathUtil.clamp( turnOutput, -1.0, 1.0 ) );
-		driveVelocityPIDController.setReference(Constants.MAX_DRIVETRAIN_SPEED * MathUtil.clamp(speed, -1.0, 1.0), CANSparkMax.ControlType.kVelocity);
-		//driveMotor.set(speed);
-		//SmartDashboard.putNumber("Module drive" + index, speed);
-		//SmartDashboard.putNumber("Module steer" + index, turnOutput);
-		if(Math.abs(speed) <= 0.01){
-			driveMotor.set(0.0);
-			driveVelocityPIDController.setReference(0.0, CANSparkMax.ControlType.kVelocity);
-		}
-		//SmartDashboard.putNumber("Angle Module " + index, getSteerAngle() * 180.0);
-		//SmartDashboard.putNumber("Speed Module " + index, driveEncoder.getVelocity());
-		//System.err.println(Constants.MAX_DRIVETRAIN_SPEED * MathUtil.clamp(speed, -1.0, 1.0));
-	}
+        // The reference angle has the range [0, 2pi) but the Neo's encoder can go above
+        // that
+        double adjustedReferenceAngleRadians = referenceAngleRadians + currentAngleRadians - currentAngleRadiansMod;
+        if (referenceAngleRadians - currentAngleRadiansMod > Math.PI) {
+            adjustedReferenceAngleRadians -= 2.0 * Math.PI;
+        } else if (referenceAngleRadians - currentAngleRadiansMod < -Math.PI) {
+            adjustedReferenceAngleRadians += 2.0 * Math.PI;
+        }
+        steerPIDController.setReference(adjustedReferenceAngleRadians, ControlType.kPosition);
+    }
+
+	public double getStateAngle() {
+        double motorAngleRadians = steerEncoder.getPosition();
+        motorAngleRadians %= 2.0 * Math.PI;
+        if (motorAngleRadians < 0.0) {
+            motorAngleRadians += 2.0 * Math.PI;
+        }
+
+        return motorAngleRadians;
+    }
 
   public void initDefaultCommand() {
     // NOTE: no default command unless running swerve modules seperately

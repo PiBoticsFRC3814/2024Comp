@@ -34,9 +34,13 @@ public class GyroSwerveDrive extends SubsystemBase {
   private double[] angle = {0.0, 0.0, 0.0, 0.0};
   private RobotStates m_RobotStates;
 
+  private SlewRateLimiter slewX = new SlewRateLimiter(Constants.JOYSTICK_X_SLEW_RATE);
+  private SlewRateLimiter slewY = new SlewRateLimiter(Constants.JOYSTICK_Y_SLEW_RATE);
+
   private SwerveDriveKinematics kinematics;
   private SwerveDrivePoseEstimator poseEstimator;
   private ADIS16470_IMU gyro;
+  PIDController turnController = new PIDController(0.02, 0.1, 0.001);
 
   public boolean trustVision;
   public Pose2d currentPose;
@@ -48,6 +52,10 @@ public class GyroSwerveDrive extends SubsystemBase {
   public GyroSwerveDrive(RobotStates robotStates, ADIS16470_IMU gyro) {
     m_RobotStates = robotStates;
     this.gyro = gyro;
+
+    turnController.setIntegratorRange(-0.2, 0.2);
+    turnController.enableContinuousInput(0.0, 360.0);
+    turnController.setTolerance(Math.toRadians(0.2));
 
     kinematics = new SwerveDriveKinematics(
       new Translation2d(Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254),
@@ -68,8 +76,8 @@ public class GyroSwerveDrive extends SubsystemBase {
     AutoBuilder.configureHolonomic(
       this::getPose,
       this::resetOdometry,
-      this::getSpeeds,
-      this::driveUnits,
+      this::getChassisSpeed,
+      this::setModuleStates,
       new HolonomicPathFollowerConfig(
         new PIDConstants(28, 0.05, 0.0),
         new PIDConstants(1.4, 0.005, 1.4),
@@ -94,8 +102,12 @@ public class GyroSwerveDrive extends SubsystemBase {
 
   //help
 
-  public ChassisSpeeds getSpeeds() {
-    return kinematics.toChassisSpeeds(getModuleState());
+  public ChassisSpeeds getChassisSpeed() {
+    return kinematics.toChassisSpeeds(
+      swerveMod[0].getState(),
+      swerveMod[3].getState(),
+      swerveMod[1].getState(),
+      swerveMod[2].getState());
   }
 
   @Override
@@ -152,16 +164,58 @@ public class GyroSwerveDrive extends SubsystemBase {
     return positions;
   }
 
+  public void setModuleStates(SwerveModuleState[] desiredStates) {
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.MAX_SPEED_MperS);
+    swerveMod[0].setDesiredState(desiredStates[0]);
+    swerveMod[1].setDesiredState(desiredStates[3]);
+    swerveMod[2].setDesiredState(desiredStates[1]);
+    swerveMod[3].setDesiredState(desiredStates[2]);
+    //m_FLModule.setDesiredState(desiredStates[0]);
+    //m_FRModule.setDesiredState(desiredStates[1]);
+    //m_RLModule.setDesiredState(desiredStates[2]);
+    //m_RRModule.setDesiredState(desiredStates[3]);
+  }
+
+  public void setModuleStates(ChassisSpeeds chassisSpeeds) {
+    SwerveModuleState[] desiredStates = kinematics.toSwerveModuleStates(secondOrderKinematics(chassisSpeeds));
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.MAX_SPEED_MperS);
+    swerveMod[0].setDesiredState(desiredStates[0]);
+    swerveMod[1].setDesiredState(desiredStates[3]);
+    swerveMod[2].setDesiredState(desiredStates[1]);
+    swerveMod[3].setDesiredState(desiredStates[2]);
+  }
+
+  public ChassisSpeeds secondOrderKinematics(ChassisSpeeds chassisSpeeds) {
+    Translation2d translation = new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+    Translation2d rotAdj = translation.rotateBy(new Rotation2d(-Math.PI / 2.0))
+        .times(chassisSpeeds.omegaRadiansPerSecond * Constants.kRotTransFactor);
+
+    translation = translation.plus(rotAdj);
+
+    return new ChassisSpeeds(translation.getX(), translation.getY(), chassisSpeeds.omegaRadiansPerSecond);
+  }
+
+
   public void resetOdometry(Pose2d pose){
-    for (int i = 0; i < 4; i++) {
-      swerveMod[i].resetModule();
-    }
     poseEstimator.resetPosition(
-      Rotation2d.fromDegrees(-gyro.getAngle(gyro.getYawAxis()) % 360.0),
+      Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis()) % 360.0),
        getModulePositions(),
         pose
     );
   }
+
+  public void drive(double xSpeed, double ySpeed, double setAngle, boolean lock, boolean speakerLock) {
+    xSpeed = slewX.calculate(xSpeed);
+    ySpeed = slewY.calculate(ySpeed);
+
+    Pose2d position = getPose();
+    if(speakerLock){setAngle = -Math.toDegrees(Math.atan2(position.getY() - 5.45, position.getY()));}
+    setAngle /= Math.PI * 180.0;
+    double rot = 0.0;
+    if(!lock) rot = turnController.calculate(setAngle, position.getRotation().getDegrees());
+    setModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, position.getRotation()));
+  }
+
 
   public void resetGyro(){
     gyro.reset();
@@ -183,135 +237,6 @@ public class GyroSwerveDrive extends SubsystemBase {
     if (Math.abs(input) < deadzone) return 0.0;
     double result = (Math.abs(input) - deadzone) / (1.0 - deadzone);
     return (input < 0.0 ? -result : result);
-  }
-
-  public void alteredGyroDrive(double dX, double dY, double dZ, double gyroAngle){
-    dX = -applyDeadzone(dX, Constants.JOYSTICK_X_DEADZONE);
-    dY = -applyDeadzone(dY, Constants.JOYSTICK_Y_DEADZONE);
-    //dZ = -applyDeadzone(dZ, Constants.JOYSTICK_Z_DEADZONE);
-    if ((dX != 0.0) || (dY != 0.0) || (dZ != 0.0)) {
-      gyroDrive(
-         dX * m_RobotStates.driveMultiplier,
-         dY * m_RobotStates.driveMultiplier,
-         -dZ,
-          gyroAngle
-      );
-      m_RobotStates.inFrontOfCubeStation = false;
-    } else{
-      speed[0] = 0.0;
-      speed[1] = 0.0;
-      speed[2] = 0.0;
-      speed[3] = 0.0;
-      setSetpoints();
-    }
-  }
-
-  public void gyroDrive(double str, double fwd, double rot, double gyroAngle) {
-    double angle = m_RobotStates.gyroReset >= 2 ? gyroAngle: poseEstimator.getEstimatedPosition().getRotation().getRadians();
-    double intermediary = fwd * Math.cos(angle) + str * Math.sin(angle);
-    str = -fwd * Math.sin(angle) + str * Math.cos(angle);
-    drive(str, intermediary, rot);
-    setSetpoints();
-  }
-
-  public void drive(double str, double fwd, double rot) {
-    if(str != 0.0 || fwd != 0.0 || rot != 0.0) computeSwerveInputs(str, fwd, rot);
-    else{
-      speed[0] = 0.0;
-      speed[1] = 0.0;
-      speed[2] = 0.0;
-      speed[3] = 0.0;
-    }
-    setSetpoints();
-  }
-
-  public void driveUnits(ChassisSpeeds driveSpeeds) {
-    //driveSpeeds = ChassisSpeeds.discretize(driveSpeeds, 0.2); 
-    double str = driveSpeeds.vyMetersPerSecond;
-    double fwd = driveSpeeds.vxMetersPerSecond;
-    double rot = driveSpeeds.omegaRadiansPerSecond;
-    double meterSecToRPM = (1 / Constants.DRIVE_POSITION_CONVERSION * 60.0);
-    //System.out.println(fwd);
-    drive(str * meterSecToRPM / Constants.MAX_DRIVETRAIN_SPEED, fwd * meterSecToRPM / Constants.MAX_DRIVETRAIN_SPEED, rot);
-  }
-
-  public SwerveModuleState[] getModuleState(){
-    SwerveModuleState[] positions = new SwerveModuleState[4];
-    positions[0] = swerveMod[0].getState();
-    positions[1] = swerveMod[3].getState();
-    positions[2] = swerveMod[1].getState();
-    positions[3] = swerveMod[2].getState();
-    return positions;
-  }
-
-  public void drive(double[] inputs) {
-    drive(inputs[0], inputs[1], inputs[2]);
-  }
-
-  /*
-   * Brake system
-   */
-  public void brakeAngle() {
-    angle[0] = -0.25;
-    angle[1] = 0.25;
-    angle[2] = -0.25;
-    angle[3] = 0.25;
-    speed[0] = 0.0;
-    speed[1] = 0.0;
-    speed[2] = 0.0;
-    speed[3] = 0.0;
-    setSetpoints();
-  }
-
-  private double getDeltaAngle(double alpha, double beta) {
-    return 1.0 - Math.abs(Math.abs(alpha - beta) % 2.0 - 1.0);
-  }
-
-  private void computeSwerveInputs(double str, double fwd, double rot) {
-    double a = str - rot * (Constants.SWERVE_FRAME_LENGTH / Constants.SWERVE_RADIUS);
-    double b = str + rot * (Constants.SWERVE_FRAME_LENGTH / Constants.SWERVE_RADIUS);
-    double c = fwd - rot * (Constants.SWERVE_FRAME_WIDTH / Constants.SWERVE_RADIUS);
-    double d = fwd + rot * (Constants.SWERVE_FRAME_WIDTH / Constants.SWERVE_RADIUS);
-
-    speed[1] = Math.sqrt((a * a) + (d * d));
-    speed[2] = Math.sqrt((a * a) + (c * c));
-    speed[0] = Math.sqrt((b * b) + (d * d));
-    speed[3] = Math.sqrt((b * b) + (c * c));
-
-    angle[1] = Math.atan2(a, d) / Math.PI;
-    angle[2] = Math.atan2(a, c) / Math.PI;
-    angle[0] = Math.atan2(b, d) / Math.PI;
-    angle[3] = Math.atan2(b, c) / Math.PI;
-  }
-
-  private void setSetpoints() {
-    for (int i = 0; i < 4; i++) {
-      double steerAngle = swerveMod[i].getSteerAngle();
-      if (getDeltaAngle(angle[i], steerAngle) > 0.5) {
-        angle[i] = Math.abs(Math.abs(angle[i] + 2.0) % 2.0) - 1.0;
-        speed[i] = -speed[i];
-      }
-      swerveMod[i].drive(speed[i], angle[i]);
-    }
-  }
-
-  public void WheelToCoast() {
-    for (int i = 0; i < 4; i++) {
-      swerveMod[i].driveMotor.setIdleMode(IdleMode.kCoast);
-    }
-  }
-
-  public void WheelToBrake() {
-    for (int i = 0; i < 4; i++) {
-      swerveMod[i].driveMotor.setIdleMode(IdleMode.kBrake);
-    }
-  }
-
-  public void outputEncoderPos() {
-    SmartDashboard.putNumber("Module 1 encoder", swerveMod[0].getSteerAngle());
-    SmartDashboard.putNumber("Module 2 encoder", swerveMod[1].getSteerAngle());
-    SmartDashboard.putNumber("Module 3 encoder", swerveMod[2].getSteerAngle());
-    SmartDashboard.putNumber("Module 4 encoder", swerveMod[3].getSteerAngle());
   }
 
   public void motorZero(){
