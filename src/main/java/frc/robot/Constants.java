@@ -59,10 +59,10 @@ public final class Constants {
 
   public static final double[][] SWERVE_STEER_PID_CONSTANTS = {
     // kP   kI   kD  kIz  kFF  kMn  kMx
-		{ 1.0e-2, 0.0, 0.0, 0.0, 0.0, -1.0, 1.0 }, //Front Right
-		{ 1.0e-2, 0.0, 0.0, 0.0, 0.0, -1.0, 1.0 }, //Rear Right
-		{ 1.0e-2, 0.0, 0.0, 0.0, 0.0, -1.0, 1.0 }, //Rear Left
-		{ 1.0e-2, 0.0, 0.0, 0.0, 0.0, -1.0, 1.0 }  //Front Left
+		{ 1.7e-2, 0.0, 2.8e-4, 0.0, 0.0, -1.0, 1.0 }, //Front Right
+		{ 1.7e-2, 0.0, 2.8e-4, 0.0, 0.0, -1.0, 1.0 }, //Rear Right
+		{ 1.7e-2, 0.0, 2.8e-4, 0.0, 0.0, -1.0, 1.0 }, //Rear Left
+		{ 1.7e-2, 0.0, 2.8e-4, 0.0, 0.0, -1.0, 1.0 }  //Front Left
 	};
 
   public static double[][] SWERVE_DRIVE_PID_CONSTANTS = { 
