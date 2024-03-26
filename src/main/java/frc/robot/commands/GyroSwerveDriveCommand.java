@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -58,6 +59,7 @@ public class GyroSwerveDriveCommand extends Command {
 
   @Override
   public void execute() {
+    /*
     steerAngle = Math.atan2(applyDeadzone(dZ.getAsDouble(), Constants.JOYSTICK_Z_DEADZONE), applyDeadzone(dZ2.getAsDouble(), Constants.JOYSTICK_Z2_DEADZONE)) / Math.PI * 180.0;
     driveHeading = (0.75 < Math.sqrt(dZ.getAsDouble() * dZ.getAsDouble() + dZ2.getAsDouble() * dZ2.getAsDouble()));
     steerAngle = steerAngle < 0.0 ? 360 + steerAngle : steerAngle;
@@ -68,6 +70,9 @@ public class GyroSwerveDriveCommand extends Command {
               driveHeading,
                 triggerPressR.getAsBoolean()
     );
+    //*/
+    //System.out.println(dX.getAsDouble() * Constants.MAX_SPEED_MperS);
+    //drivetrain.setModuleStates(new ChassisSpeeds(dX.getAsDouble() * Constants.MAX_SPEED_MperS, dY.getAsDouble() / Constants.MAX_SPEED_MperS, dZ.getAsDouble()));
   }
 
   @Override

@@ -119,6 +119,10 @@ public class GyroSwerveDrive extends SubsystemBase {
       }
       if(limelightMeasurement.avgTagDist <= 4)updateVisionPoseEstimator(limelightMeasurement.pose, limelightMeasurement.timestampSeconds, limelightMeasurement.tagCount);
     }
+    for(int i = 0; i<4; i++){
+      swerveMod[i].output();
+    }
+
     poseEstimator.updateWithTime(
       Timer.getFPGATimestamp(),
        Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis()) % 360.0),
@@ -205,8 +209,8 @@ public class GyroSwerveDrive extends SubsystemBase {
   }
 
   public void drive(double xSpeed, double ySpeed, double setAngle, boolean lock, boolean speakerLock) {
-    xSpeed = slewX.calculate(xSpeed);
-    ySpeed = slewY.calculate(ySpeed);
+    //xSpeed = slewX.calculate(xSpeed);
+    //ySpeed = slewY.calculate(ySpeed);
 
     Pose2d position = getPose();
     if(speakerLock){setAngle = -Math.toDegrees(Math.atan2(position.getY() - 5.45, position.getY()));}

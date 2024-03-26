@@ -46,7 +46,7 @@ public class MaxShoot extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(timerSpeak.get() >= 0.3) shooter.fireDifference(6000, 0.0);
+    if(timerSpeak.get() >= 0.3) shooter.fireDifference(6000, 0.1);
     if(((!intake.gotNote) || timerSpeak.get() >= 0.3) && shooter.speed.getVelocity() <= 4500){
       intake.stop();
     }
