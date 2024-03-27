@@ -90,11 +90,11 @@ public class SwerveModule {
 		steerEncoder.setVelocityConversionFactor(Constants.STEER_VELOCITY_FACTOR);
 		steerEncoder.setAverageDepth(4);
 		steerEncoder.setMeasurementPeriod(16);
+		configureCANStatusFrames(10, 20, 20, 500, 500, 200, 200, steerMotor);
+		steerMotor.burnFlash();
 
 		steerAngleEncoder = new CANcoder( Constants.SWERVE_ENCODER_IDS[swerveModIndex] );
 		steerEncoder.setPosition(getAbsolutePosition() * Math.PI * 2);
-		configureCANStatusFrames(10, 20, 20, 500, 500, 200, 200, steerMotor);
-		steerMotor.burnFlash();
 
 		index = swerveModIndex;
 	}
