@@ -73,6 +73,8 @@ public class SwerveModule {
 		steerPIDController.setIZone(Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][3]); 
 		steerPIDController.setOutputRange(Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][5], Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][6]);
 		steerPIDController.setPositionPIDWrappingEnabled(true);
+		steerPIDController.setPositionPIDWrappingMaxInput(0);
+		steerPIDController.setPositionPIDWrappingMaxInput(2 * Math.PI);
 		
 		steerEncoder = steerMotor.getEncoder();
 		steerEncoder.setPositionConversionFactor(Constants.STEER_POSITION_FACTOR);
