@@ -108,7 +108,7 @@ public final class Constants {
   public static final int CLIMB_RIGHT = 51;
 
   public static final double MAX_CLIMB_REVS = 4.5;
-  public static final double SWERVE_VOLT_COMP = 11;
+  public static final double SWERVE_VOLT_COMP = 12.6;
   public static double[][] SHOOT_PID = { 
 		// kP   kI   kD  kIz  kFF  kMn  kMx
 		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.65e-4, -1.0, 1.0 }, //Front Right
