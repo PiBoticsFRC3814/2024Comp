@@ -211,8 +211,8 @@ public class GyroSwerveDrive extends SubsystemBase {
   }
 
   public void drive(double xSpeed, double ySpeed, double setAngle, boolean lock, boolean speakerLock) {
-    xSpeed = slewX.calculate(xSpeed);
-    ySpeed = slewY.calculate(ySpeed);
+    //xSpeed = slewX.calculate(xSpeed);
+    //ySpeed = slewY.calculate(ySpeed);
 
     Pose2d position = getPose();
     if(speakerLock){setAngle = -Math.toDegrees(Math.atan2(position.getY() - 5.45, position.getY()));}
