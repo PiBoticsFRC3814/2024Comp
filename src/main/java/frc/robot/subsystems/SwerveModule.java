@@ -26,7 +26,7 @@ public class SwerveModule {
 	private SparkPIDController steerPIDController;
 
 	public CANSparkMax            steerMotor;
-	private CoreCANcoder              steerAngleEncoder;
+	private CANcoder              steerAngleEncoder;
 	private SimpleMotorFeedforward driveFF;
 
 	public double                 position;
@@ -83,7 +83,7 @@ public class SwerveModule {
 		steerEncoder.setMeasurementPeriod(16);
 
 		steerAngleEncoder = new CANcoder( Constants.SWERVE_ENCODER_IDS[swerveModIndex] );
-		steerEncoder.setPosition(steerAngleEncoder.getAbsolutePosition().getValue() * Math.PI * 2);
+		steerEncoder.setPosition(steerAngleEncoder.getAbsolutePosition() * Math.PI * 2);
 		configureCANStatusFrames(10, 20, 20, 500, 500, 200, 200, steerMotor);
 		steerMotor.burnFlash();
 
