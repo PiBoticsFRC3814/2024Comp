@@ -180,6 +180,13 @@ public class GyroSwerveDrive extends SubsystemBase {
     //m_RRModule.setDesiredState(desiredStates[3]);
   }
 
+  public void resetModules(){
+    swerveMod[0].resetModule();
+    swerveMod[1].resetModule();
+    swerveMod[2].resetModule();
+    swerveMod[3].resetModule();
+  }
+  
   public void setModuleStates(ChassisSpeeds chassisSpeeds) {
     /*
     SwerveModuleState[] desiredStates = kinematics.toSwerveModuleStates(secondOrderKinematics(chassisSpeeds));
