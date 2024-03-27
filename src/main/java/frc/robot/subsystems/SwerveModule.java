@@ -49,7 +49,7 @@ public class SwerveModule {
 		driveVelocityPIDController.setD(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][2]);
 		driveVelocityPIDController.setIZone(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][3]); 
 		//driveVelocityPIDController.setFF(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][4]);
-		driveFF = new SimpleMotorFeedforward(0.0, Constants.SWERVE_VOLT_COMP / 5820, Constants.SWERVE_VOLT_COMP / (1.19 * 9.81));
+		driveFF = new SimpleMotorFeedforward(0.01, Constants.SWERVE_VOLT_COMP / (5820 * Constants.DRIVE_VELOCITY_FACTOR), Constants.SWERVE_VOLT_COMP / (1.19 * 9.81));
 		driveVelocityPIDController.setOutputRange(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][5], Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][6]);
 
 		driveEncoder = driveMotor.getEncoder();
@@ -119,7 +119,7 @@ public class SwerveModule {
 	public void setDesiredState(SwerveModuleState desiredState) {
         // Optimize the reference state to avoid spinning further than 90 degrees
         SwerveModuleState state = SwerveModuleState.optimize(desiredState, new Rotation2d(getStateAngle()));
-	double velocity = getCosineCompensatedVelocity(state)
+	double velocity = getCosineCompensatedVelocity(state);
 
         driveVelocityPIDController.setReference(velocity, ControlType.kVelocity, 0, driveFF.calculate(velocity));
         //driveVelocityPIDController.setReference(1.0, ControlType.kVelocity);
