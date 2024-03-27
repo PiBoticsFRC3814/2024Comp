@@ -117,11 +117,33 @@ public class SwerveModule {
 	public void setDesiredState(SwerveModuleState desiredState) {
         // Optimize the reference state to avoid spinning further than 90 degrees
         SwerveModuleState state = SwerveModuleState.optimize(desiredState, new Rotation2d(getStateAngle()));
+	double velocity = getCosineCompensatedVelocity(state)
 
-        driveVelocityPIDController.setReference(state.speedMetersPerSecond, ControlType.kVelocity);
+        driveVelocityPIDController.setReference(velocity, ControlType.kVelocity, 0, driveFF.calculate(velocity));
         //driveVelocityPIDController.setReference(1.0, ControlType.kVelocity);
         setReferenceAngle(state.angle.getRadians());
+    	}
+	
+	  private double getCosineCompensatedVelocity(SwerveModuleState desiredState)
+  {
+    double cosineScalar = 1.0;
+    // Taken from the CTRE SwerveModule class.
+    // https://api.ctr-electronics.com/phoenix6/release/java/src-html/com/ctre/phoenix6/mechanisms/swerve/SwerveModule.html#line.46
+    /* From FRC 900's whitepaper, we add a cosine compensator to the applied drive velocity */
+    /* To reduce the "skew" that occurs when changing direction */
+    /* If error is close to 0 rotations, we're already there, so apply full power */
+    /* If the error is close to 0.25 rotations, then we're 90 degrees, so movement doesn't help us at all */
+    cosineScalar = Rotation2d.fromDegrees(desiredState.angle.getDegrees())
+                             .minus(Rotation2d.fromDegrees(getAbsolutePosition()))
+                             .getCos(); // TODO: Investigate angle modulus by 180.
+    /* Make sure we don't invert our drive, even though we shouldn't ever target over 90 degrees anyway */
+    if (cosineScalar < 0.0)
+    {
+      cosineScalar = 1;
     }
+
+    return desiredState.speedMetersPerSecond * (cosineScalar);
+  }
 
 	public void setReferenceAngle(double referenceAngleRadians) {
         double currentAngleRadians = steerEncoder.getPosition();
