@@ -94,7 +94,7 @@ public class SwerveModule {
 		steerMotor.burnFlash();
 
 		steerAngleEncoder = new CANcoder( Constants.SWERVE_ENCODER_IDS[swerveModIndex] );
-		steerEncoder.setPosition(getAbsolutePosition() * Math.PI * 2);
+		steerEncoder.setPosition(getAbsolutePosition());
 
 		index = swerveModIndex;
 	}
@@ -160,6 +160,11 @@ public class SwerveModule {
 
     return desiredState.speedMetersPerSecond * (cosineScalar);
   }
+
+	public void resetModule(){
+		steerEncoder.setPosition(getAbsolutePosition());
+		setDesiredState(new SwerveModuleState(0.0, new Rotation2d(0)))
+	}
 
 	public void setReferenceAngle(double referenceAngleRadians) {
         double currentAngleRadians = steerEncoder.getPosition();
@@ -227,7 +232,7 @@ public double getAbsolutePosition()
       readingIgnored.set(false);
     }
 
-    return angle.getValue() * 360;
+    return angle.getValue() * Math.PI * 2.0;
   }
 
   public void initDefaultCommand() {
