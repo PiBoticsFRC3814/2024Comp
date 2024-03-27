@@ -99,6 +99,7 @@ public class Robot extends TimedRobot {
     m_robotContainer.m_robotStates.autonomous = true;
     LimelightHelpers.setPipelineIndex("limelight", 0);
     m_robotContainer.m_gyroSwerveDrive.removeDefaultCommand();
+    m_robotContainer.m_gyroSwerveDrive.resetModules();
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
@@ -134,6 +135,7 @@ public class Robot extends TimedRobot {
             () -> m_robotContainer.driveStick.getLeftTriggerAxis() >= 0.8,
             m_robotContainer.m_gyro,
             m_robotContainer.m_gyroSwerveDrive));
+    m_robotContainer.m_gyroSwerveDrive.resetModules();
     LimelightHelpers.setPipelineIndex("limelight", 1);
     m_robotContainer.m_robotStates.autonomous = false;
   }
