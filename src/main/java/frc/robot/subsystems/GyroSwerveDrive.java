@@ -181,7 +181,7 @@ public class GyroSwerveDrive extends SubsystemBase {
   }
 
   public void setModuleStates(ChassisSpeeds chassisSpeeds) {
-    //*
+    /*
     SwerveModuleState[] desiredStates = kinematics.toSwerveModuleStates(secondOrderKinematics(chassisSpeeds));
     //*/SwerveModuleState[] desiredStates = kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(chassisSpeeds, 0.02));
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.MAX_SPEED_MperS);
