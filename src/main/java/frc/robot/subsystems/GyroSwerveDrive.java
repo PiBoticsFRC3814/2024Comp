@@ -105,9 +105,9 @@ public class GyroSwerveDrive extends SubsystemBase {
   public ChassisSpeeds getChassisSpeed() {
     return kinematics.toChassisSpeeds(
       swerveMod[0].getState(),
-      swerveMod[3].getState(),
       swerveMod[1].getState(),
-      swerveMod[2].getState());
+      swerveMod[2].getState(),
+      swerveMod[3].getState());
   }
 
   @Override
@@ -216,6 +216,7 @@ public class GyroSwerveDrive extends SubsystemBase {
     if(speakerLock){setAngle = -Math.toDegrees(Math.atan2(position.getY() - 5.45, position.getY()));}
     double rot = 0.0;
     if(lock) rot = turnController.calculate(setAngle, position.getRotation().getDegrees());
+    rot *= Constants.MAX_SPEED_MperS / new Rotation2d(Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254).getRadians();
     setModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, position.getRotation()));
   }
 
