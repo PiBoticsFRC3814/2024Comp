@@ -48,7 +48,8 @@ public class SwerveModule {
 		driveVelocityPIDController.setI(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][1]);
 		driveVelocityPIDController.setD(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][2]);
 		driveVelocityPIDController.setIZone(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][3]); 
-		driveVelocityPIDController.setFF(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][4]);
+		//driveVelocityPIDController.setFF(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][4]);
+		driveFF = new SimpleMotorFeedforward(0.0, Constants.SWERVE_VOLT_COMP / 5820, Constants.SWERVE_VOLT_COMP / (1.19 * 9.81));
 		driveVelocityPIDController.setOutputRange(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][5], Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][6]);
 
 		driveEncoder = driveMotor.getEncoder();
@@ -81,7 +82,7 @@ public class SwerveModule {
 
 		steerAngleEncoder = new CANcoder( Constants.SWERVE_ENCODER_IDS[swerveModIndex] );
 		steerEncoder.setPosition(steerAngleEncoder.getAbsolutePosition().getValue() * Math.PI * 2);
-		configureCANStatusFrames(10, 20, 20, 500, 500, 200, 200, driveMotor);
+		configureCANStatusFrames(10, 20, 20, 500, 500, 200, 200, steerMotor);
 		steerMotor.burnFlash();
 
 		index = swerveModIndex;
