@@ -56,6 +56,8 @@ public class SwerveModule {
 		driveEncoder.setVelocityConversionFactor(Constants.DRIVE_VELOCITY_FACTOR);
 		driveEncoder.setAverageDepth(4);
 		driveEncoder.setMeasurementPeriod(16);
+		configureCANStatusFrames(10, 20, 20, 500, 500, 200, 200, driveMotor);
+		driveMotor.burnFlash();
 		
 		steerMotor = new CANSparkMax( Constants.SWERVE_STEER_MOTOR_IDS[swerveModIndex], MotorType.kBrushless );
 		steerMotor.enableVoltageCompensation(Constants.SWERVE_VOLT_COMP);
@@ -68,7 +70,7 @@ public class SwerveModule {
 		steerPIDController.setI(Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][1]);
 		steerPIDController.setD(Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][2]);
 		steerPIDController.setIZone(Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][3]); 
-		driveVelocityPIDController.setOutputRange(Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][5], Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][6]);
+		steerPIDController.setOutputRange(Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][5], Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][6]);
 		steerPIDController.setPositionPIDWrappingEnabled(true);
 		
 		steerEncoder = steerMotor.getEncoder();
@@ -78,13 +80,29 @@ public class SwerveModule {
 		steerEncoder.setMeasurementPeriod(16);
 
 		steerAngleEncoder = new CANcoder( Constants.SWERVE_ENCODER_IDS[swerveModIndex] );
-		steerEncoder.setPosition(steerAngleEncoder.getAbsolutePosition().getValue());
+		steerEncoder.setPosition(steerAngleEncoder.getAbsolutePosition().getValue() * Math.PI * 2);
+		configureCANStatusFrames(10, 20, 20, 500, 500, 200, 200, driveMotor);
+		steerMotor.burnFlash();
 
 		index = swerveModIndex;
 	}
 	public SwerveModuleState getState() {
         return new SwerveModuleState(driveEncoder.getVelocity(), new Rotation2d(getStateAngle()));
     }
+
+	public void configureCANStatusFrames(
+      int CANStatus0, int CANStatus1, int CANStatus2, int CANStatus3, int CANStatus4, int CANStatus5, int CANStatus6, CANSparkMax motor)
+  {
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, CANStatus0);
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, CANStatus1);
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, CANStatus2);
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, CANStatus3);
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, CANStatus4);
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, CANStatus5);
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, CANStatus6);
+    //  https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
+  }
+
 
 	public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(driveEncoder.getPosition(), new Rotation2d(getStateAngle()));
@@ -121,6 +139,7 @@ public class SwerveModule {
             adjustedReferenceAngleRadians += 2.0 * Math.PI;
         }
         steerPIDController.setReference(adjustedReferenceAngleRadians, ControlType.kPosition);
+        //steerPIDController.setReference(0.0, ControlType.kPosition);
     }
 
 	public double getStateAngle() {

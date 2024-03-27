@@ -59,20 +59,20 @@ public class GyroSwerveDriveCommand extends Command {
 
   @Override
   public void execute() {
-    /*
+    //*
     steerAngle = Math.atan2(applyDeadzone(dZ.getAsDouble(), Constants.JOYSTICK_Z_DEADZONE), applyDeadzone(dZ2.getAsDouble(), Constants.JOYSTICK_Z2_DEADZONE)) / Math.PI * 180.0;
     driveHeading = (0.75 < Math.sqrt(dZ.getAsDouble() * dZ.getAsDouble() + dZ2.getAsDouble() * dZ2.getAsDouble()));
     steerAngle = steerAngle < 0.0 ? 360 + steerAngle : steerAngle;
     drivetrain.drive(
-        applyDeadzone(dX.getAsDouble(), Constants.JOYSTICK_X_DEADZONE) * Constants.MAX_SPEED_MperS,
-          applyDeadzone(-dY.getAsDouble(), Constants.JOYSTICK_X_DEADZONE) * Constants.MAX_SPEED_MperS,
+        applyDeadzone(dY.getAsDouble(), Constants.JOYSTICK_X_DEADZONE) * Constants.MAX_SPEED_MperS,
+          applyDeadzone(dX.getAsDouble(), Constants.JOYSTICK_X_DEADZONE) * Constants.MAX_SPEED_MperS,
             steerAngle,
               driveHeading,
                 triggerPressR.getAsBoolean()
     );
     //*/
     //System.out.println(dX.getAsDouble() * Constants.MAX_SPEED_MperS);
-    //drivetrain.setModuleStates(new ChassisSpeeds(dX.getAsDouble() * Constants.MAX_SPEED_MperS, dY.getAsDouble() / Constants.MAX_SPEED_MperS, dZ.getAsDouble()));
+    //drivetrain.setModuleStates(new ChassisSpeeds(applyDeadzone(dY.getAsDouble(), Constants.JOYSTICK_X_DEADZONE) * Constants.MAX_SPEED_MperS, applyDeadzone(dX.getAsDouble(), Constants.JOYSTICK_X_DEADZONE) * Constants.MAX_SPEED_MperS, applyDeadzone(dZ.getAsDouble(), Constants.JOYSTICK_X_DEADZONE)));
   }
 
   @Override

@@ -162,18 +162,18 @@ public class GyroSwerveDrive extends SubsystemBase {
   private SwerveModulePosition[] getModulePositions(){
     SwerveModulePosition[] positions = new SwerveModulePosition[4];
     positions[0] = swerveMod[0].getPosition();
-    positions[1] = swerveMod[3].getPosition();
-    positions[2] = swerveMod[1].getPosition();
-    positions[3] = swerveMod[2].getPosition();
+    positions[1] = swerveMod[1].getPosition();
+    positions[2] = swerveMod[2].getPosition();
+    positions[3] = swerveMod[3].getPosition();
     return positions;
   }
 
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.MAX_SPEED_MperS);
     swerveMod[0].setDesiredState(desiredStates[0]);
-    swerveMod[1].setDesiredState(desiredStates[3]);
-    swerveMod[2].setDesiredState(desiredStates[1]);
-    swerveMod[3].setDesiredState(desiredStates[2]);
+    swerveMod[1].setDesiredState(desiredStates[1]);
+    swerveMod[2].setDesiredState(desiredStates[2]);
+    swerveMod[3].setDesiredState(desiredStates[3]);
     //m_FLModule.setDesiredState(desiredStates[0]);
     //m_FRModule.setDesiredState(desiredStates[1]);
     //m_RLModule.setDesiredState(desiredStates[2]);
@@ -184,9 +184,9 @@ public class GyroSwerveDrive extends SubsystemBase {
     SwerveModuleState[] desiredStates = kinematics.toSwerveModuleStates(secondOrderKinematics(chassisSpeeds));
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.MAX_SPEED_MperS);
     swerveMod[0].setDesiredState(desiredStates[0]);
-    swerveMod[1].setDesiredState(desiredStates[3]);
-    swerveMod[2].setDesiredState(desiredStates[1]);
-    swerveMod[3].setDesiredState(desiredStates[2]);
+    swerveMod[1].setDesiredState(desiredStates[1]);
+    swerveMod[2].setDesiredState(desiredStates[2]);
+    swerveMod[3].setDesiredState(desiredStates[3]);
   }
 
   public ChassisSpeeds secondOrderKinematics(ChassisSpeeds chassisSpeeds) {
@@ -209,14 +209,13 @@ public class GyroSwerveDrive extends SubsystemBase {
   }
 
   public void drive(double xSpeed, double ySpeed, double setAngle, boolean lock, boolean speakerLock) {
-    //xSpeed = slewX.calculate(xSpeed);
-    //ySpeed = slewY.calculate(ySpeed);
+    xSpeed = slewX.calculate(xSpeed);
+    ySpeed = slewY.calculate(ySpeed);
 
     Pose2d position = getPose();
     if(speakerLock){setAngle = -Math.toDegrees(Math.atan2(position.getY() - 5.45, position.getY()));}
-    setAngle /= Math.PI * 180.0;
     double rot = 0.0;
-    if(!lock) rot = turnController.calculate(setAngle, position.getRotation().getDegrees());
+    if(lock) rot = turnController.calculate(setAngle, position.getRotation().getDegrees());
     setModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, position.getRotation()));
   }
 

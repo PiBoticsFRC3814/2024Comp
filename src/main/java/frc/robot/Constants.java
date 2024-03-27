@@ -43,9 +43,9 @@ public final class Constants {
    * Swerve module motor and encoder ids
    * { Front Right, Back Right, Back Left, Front Left }
    */
-  public static final int[] SWERVE_DRIVE_MOTOR_IDS = {22, 23, 20, 21};
-  public static final int[] SWERVE_STEER_MOTOR_IDS = {32, 33, 30, 31};
-  public static final int[] SWERVE_ENCODER_IDS = {42, 43, 40, 41};
+  public static final int[] SWERVE_DRIVE_MOTOR_IDS = {21, 22, 20, 23};//{22, 23, 20, 21};
+  public static final int[] SWERVE_STEER_MOTOR_IDS = {31, 32, 30, 33};//{32, 33, 30, 31};
+  public static final int[] SWERVE_ENCODER_IDS =     {41, 42, 40, 43};//{42, 43, 40, 41};
 
   public static final int swerveModuleNumber = 4;
 
@@ -59,18 +59,18 @@ public final class Constants {
 
   public static final double[][] SWERVE_STEER_PID_CONSTANTS = {
     // kP   kI   kD  kIz  kFF  kMn  kMx
-		{ 1.7e-2, 0.0, 2.8e-4, 0.0, 0.0, -1.0, 1.0 }, //Front Right
-		{ 1.7e-2, 0.0, 2.8e-4, 0.0, 0.0, -1.0, 1.0 }, //Rear Right
-		{ 1.7e-2, 0.0, 2.8e-4, 0.0, 0.0, -1.0, 1.0 }, //Rear Left
-		{ 1.7e-2, 0.0, 2.8e-4, 0.0, 0.0, -1.0, 1.0 }  //Front Left
+		{ 3.0, 0.2e-2, 0.0, 0.0, 0.0, -1.0, 1.0 }, //Front Right
+		{ 3.0, 0.2e-2, 0.0, 0.0, 0.0, -1.0, 1.0 }, //Rear Right
+		{ 3.0, 0.2e-2, 0.0, 0.0, 0.0, -1.0, 1.0 }, //Rear Left
+		{ 3.0, 0.2e-2, 0.0, 0.0, 0.0, -1.0, 1.0 }  //Front Left
 	};
 
   public static double[][] SWERVE_DRIVE_PID_CONSTANTS = { 
 		// kP   kI   kD  kIz  kFF  kMn  kMx
-		{ 1.0e-2, 0.0, 2.0e-2, 0.0, 0.2, -1.0, 1.0 }, //Front Right
-		{ 1.0e-2, 0.0, 2.0e-2, 0.0, 0.2, -1.0, 1.0 }, //Rear Right
-		{ 1.0e-2, 0.0, 2.0e-2, 0.0, 0.2, -1.0, 1.0 }, //Rear Left
-		{ 1.0e-2, 0.0, 2.0e-2, 0.0, 0.2, -1.0, 1.0 }  //Front Left
+		{ 1.5e-2, 0.0, 2.0e-2, 0.0, 0.2, -1.0, 1.0 }, //Front Right
+		{ 1.5e-2, 0.0, 2.0e-2, 0.0, 0.2, -1.0, 1.0 }, //Rear Right
+		{ 1.5e-2, 0.0, 2.0e-2, 0.0, 0.2, -1.0, 1.0 }, //Rear Left
+		{ 1.5e-2, 0.0, 2.0e-2, 0.0, 0.2, -1.0, 1.0 }  //Front Left
 	};
 
   public static final double MAX_DRIVETRAIN_SPEED = 5820;
@@ -79,14 +79,14 @@ public final class Constants {
   public static final double[] TAG_ALIGN_ROT_PID = {0.01, 5.0e-2, 0.002};
   public static final double[] TAG_ALIGN_FWD_PID = {0.4, 0.0, 0.006};
 
-  public static final boolean[] STEER_MOTOR_INVERTED = {false, false, false, false};
+  public static final boolean[] STEER_MOTOR_INVERTED = {true, true, true, true};
   public static final boolean[] DRIVE_MOTOR_INVERTED = {false, false, false, false};
 
   /*
    * Swerve constants for swerve module calculations
    */
-  public static final double SWERVE_FRAME_LENGTH = 25.5;
   public static final double SWERVE_FRAME_WIDTH = 20.5;
+  public static final double SWERVE_FRAME_LENGTH = 25.5;
   public static final double SWERVE_RADIUS = Math.sqrt(Math.pow(SWERVE_FRAME_LENGTH, 2) + Math.pow(SWERVE_FRAME_WIDTH, 2));
   public static final double SWERVE_PID_TOLERANCE = 2.8e-4;
   public static final double DRIVE_POSITION_CONVERSION = (4.0 * 0.0254 * Math.PI) / (6.75);
@@ -108,7 +108,7 @@ public final class Constants {
   public static final int CLIMB_RIGHT = 51;
 
   public static final double MAX_CLIMB_REVS = 4.5;
-  public static final double SWERVE_VOLT_COMP = 12.6;
+  public static final double SWERVE_VOLT_COMP = 11;
   public static double[][] SHOOT_PID = { 
 		// kP   kI   kD  kIz  kFF  kMn  kMx
 		{ 1.0e-4, 0.0, 2.0e-4, 0.0, 1.65e-4, -1.0, 1.0 }, //Front Right
