@@ -1,7 +1,14 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.CANcoderConfigurator;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.core.CoreCANcoder;
+import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
+import com.ctre.phoenix6.signals.MagnetHealthValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
@@ -33,6 +40,8 @@ public class SwerveModule {
 	private int 				  index;
 	public RelativeEncoder 		  driveEncoder;
 	public RelativeEncoder 		  steerEncoder;
+
+	public static double   STATUS_TIMEOUT_SECONDS = 0.02;
 	
 	/* the SwerveModule subsystem */
 	public SwerveModule( int swerveModIndex ) {
@@ -83,7 +92,7 @@ public class SwerveModule {
 		steerEncoder.setMeasurementPeriod(16);
 
 		steerAngleEncoder = new CANcoder( Constants.SWERVE_ENCODER_IDS[swerveModIndex] );
-		steerEncoder.setPosition(steerAngleEncoder.getAbsolutePosition() * Math.PI * 2);
+		steerEncoder.setPosition(getAbsolutePosition() * Math.PI * 2);
 		configureCANStatusFrames(10, 20, 20, 500, 500, 200, 200, steerMotor);
 		steerMotor.burnFlash();
 
@@ -181,6 +190,45 @@ public class SwerveModule {
 
         return motorAngleRadians;
     }
+
+public double getAbsolutePosition()
+  {
+    readingError = false;
+    MagnetHealthValue strength = steerAngleEncoder.getMagnetHealth().getValue();
+
+    if (strength == MagnetHealthValue.Magnet_Invalid || strength == MagnetHealthValue.Magnet_Red)
+    {
+      readingError = true;
+      readingFaulty.set(true);
+      return 0;
+    } else
+    {
+      readingFaulty.set(false);
+    }
+
+    StatusSignal<Double> angle = steerAngleEncoder.getAbsolutePosition();
+
+    // Taken from democat's library.
+    // Source: https://github.com/democat3457/swerve-lib/blob/7c03126b8c22f23a501b2c2742f9d173a5bcbc40/src/main/java/com/swervedrivespecialties/swervelib/ctre/CanCoderFactoryBuilder.java#L51-L74
+    for (int i = 0; i < maximumRetries; i++)
+    {
+      if (angle.getStatus() == StatusCode.OK)
+      {
+        break;
+      }
+      angle = angle.waitForUpdate(STATUS_TIMEOUT_SECONDS);
+    }
+    if (angle.getStatus() != StatusCode.OK)
+    {
+      readingError = true;
+      readingIgnored.set(true);
+    } else
+    {
+      readingIgnored.set(false);
+    }
+
+    return angle.getValue() * 360;
+  }
 
   public void initDefaultCommand() {
     // NOTE: no default command unless running swerve modules seperately
