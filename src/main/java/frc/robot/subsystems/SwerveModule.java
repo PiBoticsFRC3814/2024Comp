@@ -119,11 +119,16 @@ public class SwerveModule {
 	public void setDesiredState(SwerveModuleState desiredState) {
         // Optimize the reference state to avoid spinning further than 90 degrees
         SwerveModuleState state = SwerveModuleState.optimize(desiredState, new Rotation2d(getStateAngle()));
-	double velocity = getCosineCompensatedVelocity(state);
+	if((Math.abs(state.speedMetersPerSecond) > 0.01) && Math.abs(state.angle.getRadians() - getStateAngle) < Rotation2d.fromDegrees(0.2).getRadians()){
+		driveMotor.set(0);
+		steerMotor.set(0);
+	} else {
+		double velocity = getCosineCompensatedVelocity(state);
 
-        driveVelocityPIDController.setReference(velocity, ControlType.kVelocity, 0, driveFF.calculate(velocity));
-        //driveVelocityPIDController.setReference(1.0, ControlType.kVelocity);
-        setReferenceAngle(state.angle.getRadians());
+        	driveVelocityPIDController.setReference(velocity, ControlType.kVelocity, 0, driveFF.calculate(velocity));
+        	//driveVelocityPIDController.setReference(1.0, ControlType.kVelocity);
+        	setReferenceAngle(state.angle.getRadians());
+	}
     	}
 	
 	  private double getCosineCompensatedVelocity(SwerveModuleState desiredState)
