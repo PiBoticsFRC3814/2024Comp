@@ -1,12 +1,6 @@
 {
   "version": 1.0,
-  "startingPose": {
-    "position": {
-      "x": 0.7629427135338847,
-      "y": 4.484888779753807
-    },
-    "rotation": -61.260204708311974
-  },
+  "startingPose": null,
   "command": {
     "type": "sequential",
     "data": {
@@ -24,7 +18,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Right Pickup"
+                  "pathName": "Stage Pickup"
                 }
               },
               {
@@ -45,14 +39,14 @@
                 "data": {
                   "pathName": "Far Right Return"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "SpeakerFire"
-                }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerFire"
           }
         },
         {
@@ -83,14 +77,14 @@
                 "data": {
                   "pathName": "Far Right Return"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "SpeakerFire"
-                }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerFire"
           }
         }
       ]

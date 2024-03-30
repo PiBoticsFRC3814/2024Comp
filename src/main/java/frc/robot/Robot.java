@@ -136,7 +136,7 @@ public class Robot extends TimedRobot {
             m_robotContainer.m_gyro,
             m_robotContainer.m_gyroSwerveDrive));
     m_robotContainer.m_gyroSwerveDrive.resetModules();
-    LimelightHelpers.setPipelineIndex("limelight", 1);
+    LimelightHelpers.setPipelineIndex("limelight", 0);
     m_robotContainer.m_robotStates.autonomous = false;
   }
 

@@ -157,6 +157,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
+    m_robotStates.center = chooserFirst.getSelected() == "Center Auto";
     return new PathPlannerAuto(chooserFirst.getSelected());
   }
 }

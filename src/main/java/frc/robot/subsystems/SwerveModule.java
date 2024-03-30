@@ -49,16 +49,15 @@ public class SwerveModule {
 		driveMotor.setIdleMode(IdleMode.kBrake);
 		driveMotor.enableVoltageCompensation(Constants.SWERVE_VOLT_COMP);
 		driveMotor.setInverted( Constants.DRIVE_MOTOR_INVERTED[swerveModIndex] );
-		driveMotor.setOpenLoopRampRate( 0.2 );
-		driveMotor.setSmartCurrentLimit(50, 55);
+		driveMotor.setOpenLoopRampRate( 0.4 );
+		driveMotor.setSmartCurrentLimit(50, 40);
 
 		driveVelocityPIDController = driveMotor.getPIDController();
 		driveVelocityPIDController.setP(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][0]);
 		driveVelocityPIDController.setI(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][1]);
 		driveVelocityPIDController.setD(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][2]);
 		driveVelocityPIDController.setIZone(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][3]); 
-		//driveVelocityPIDController.setFF(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][4]);
-		driveFF = new SimpleMotorFeedforward(0.01, Constants.SWERVE_VOLT_COMP / (5820 * Constants.DRIVE_VELOCITY_FACTOR), Constants.SWERVE_VOLT_COMP / (1.19 * 9.81));
+		driveVelocityPIDController.setFF(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][4]);
 		driveVelocityPIDController.setOutputRange(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][5], Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][6]);
 
 		driveEncoder = driveMotor.getEncoder();
@@ -71,9 +70,9 @@ public class SwerveModule {
 		
 		steerMotor = new CANSparkMax( Constants.SWERVE_STEER_MOTOR_IDS[swerveModIndex], MotorType.kBrushless );
 		steerMotor.enableVoltageCompensation(Constants.SWERVE_VOLT_COMP);
-		steerMotor.setIdleMode(IdleMode.kCoast);
+		steerMotor.setIdleMode(IdleMode.kBrake);
 		steerMotor.setInverted( Constants.STEER_MOTOR_INVERTED[swerveModIndex] );
-		steerMotor.setSmartCurrentLimit(50, 40);
+		steerMotor.setSmartCurrentLimit(40, 20);
 
 		steerPIDController = steerMotor.getPIDController();
 		steerPIDController.setP(Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][0]);
@@ -82,7 +81,7 @@ public class SwerveModule {
 		steerPIDController.setIZone(Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][3]); 
 		steerPIDController.setOutputRange(Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][5], Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][6]);
 		steerPIDController.setPositionPIDWrappingEnabled(true);
-		steerPIDController.setPositionPIDWrappingMaxInput(0);
+		steerPIDController.setPositionPIDWrappingMinInput(0);
 		steerPIDController.setPositionPIDWrappingMaxInput(2 * Math.PI);
 		
 		steerEncoder = steerMotor.getEncoder();
@@ -128,14 +127,14 @@ public class SwerveModule {
 	public void setDesiredState(SwerveModuleState desiredState) {
         // Optimize the reference state to avoid spinning further than 90 degrees
         SwerveModuleState state = SwerveModuleState.optimize(desiredState, new Rotation2d(getStateAngle()));
-	if((Math.abs(state.speedMetersPerSecond) > 0.01) && Math.abs(state.angle.getRadians() - getStateAngle) < Rotation2d.fromDegrees(0.2).getRadians()){
+	if(((Math.abs(state.speedMetersPerSecond) < 0.05) && Math.abs(state.angle.getRadians() - getStateAngle()) < 0.02 ) && steerEncoder.getVelocity() < 0.1){
 		driveMotor.set(0);
 		steerMotor.set(0);
 	} else {
 		double velocity = getCosineCompensatedVelocity(state);
 
-        	driveVelocityPIDController.setReference(velocity, ControlType.kVelocity, 0, driveFF.calculate(velocity));
-        	//driveVelocityPIDController.setReference(1.0, ControlType.kVelocity);
+        	driveVelocityPIDController.setReference(velocity, ControlType.kVelocity);
+        	//driveVelocityPIDController.setReference(Constants.MAX_SPEED_MperS, ControlType.kVelocity);
         	setReferenceAngle(state.angle.getRadians());
 	}
     	}
@@ -150,7 +149,7 @@ public class SwerveModule {
     /* If error is close to 0 rotations, we're already there, so apply full power */
     /* If the error is close to 0.25 rotations, then we're 90 degrees, so movement doesn't help us at all */
     cosineScalar = Rotation2d.fromDegrees(desiredState.angle.getDegrees())
-                             .minus(Rotation2d.fromDegrees(getAbsolutePosition()))
+                             .minus(new Rotation2d(getStateAngle()))
                              .getCos(); // TODO: Investigate angle modulus by 180.
     /* Make sure we don't invert our drive, even though we shouldn't ever target over 90 degrees anyway */
     if (cosineScalar < 0.0)
@@ -163,7 +162,7 @@ public class SwerveModule {
 
 	public void resetModule(){
 		steerEncoder.setPosition(getAbsolutePosition());
-		setDesiredState(new SwerveModuleState(0.0, new Rotation2d(0)))
+		setDesiredState(new SwerveModuleState(0.0, new Rotation2d(0)));
 	}
 
 	public void setReferenceAngle(double referenceAngleRadians) {
@@ -198,38 +197,18 @@ public class SwerveModule {
 
 public double getAbsolutePosition()
   {
-    readingError = false;
-    MagnetHealthValue strength = steerAngleEncoder.getMagnetHealth().getValue();
-
-    if (strength == MagnetHealthValue.Magnet_Invalid || strength == MagnetHealthValue.Magnet_Red)
-    {
-      readingError = true;
-      readingFaulty.set(true);
-      return 0;
-    } else
-    {
-      readingFaulty.set(false);
-    }
 
     StatusSignal<Double> angle = steerAngleEncoder.getAbsolutePosition();
 
     // Taken from democat's library.
     // Source: https://github.com/democat3457/swerve-lib/blob/7c03126b8c22f23a501b2c2742f9d173a5bcbc40/src/main/java/com/swervedrivespecialties/swervelib/ctre/CanCoderFactoryBuilder.java#L51-L74
-    for (int i = 0; i < maximumRetries; i++)
+    for (int i = 0; i < 10; i++)
     {
       if (angle.getStatus() == StatusCode.OK)
       {
         break;
       }
       angle = angle.waitForUpdate(STATUS_TIMEOUT_SECONDS);
-    }
-    if (angle.getStatus() != StatusCode.OK)
-    {
-      readingError = true;
-      readingIgnored.set(true);
-    } else
-    {
-      readingIgnored.set(false);
     }
 
     return angle.getValue() * Math.PI * 2.0;

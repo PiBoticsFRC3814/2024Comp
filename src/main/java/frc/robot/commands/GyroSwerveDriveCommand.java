@@ -60,12 +60,12 @@ public class GyroSwerveDriveCommand extends Command {
   @Override
   public void execute() {
     //*
-    steerAngle = Math.atan2(applyDeadzone(dZ.getAsDouble(), Constants.JOYSTICK_Z_DEADZONE), applyDeadzone(dZ2.getAsDouble(), Constants.JOYSTICK_Z2_DEADZONE)) / Math.PI * 180.0;
+    steerAngle = Math.atan2(applyDeadzone(-dZ.getAsDouble(), Constants.JOYSTICK_Z_DEADZONE), applyDeadzone(dZ2.getAsDouble(), Constants.JOYSTICK_Z2_DEADZONE)) / Math.PI * 180.0;
     driveHeading = (0.5625 < dZ.getAsDouble() * dZ.getAsDouble() + dZ2.getAsDouble() * dZ2.getAsDouble());
     steerAngle = steerAngle < 0.0 ? 360 + steerAngle : steerAngle;
     drivetrain.drive(
-        applyDeadzone(dY.getAsDouble(), Constants.JOYSTICK_X_DEADZONE) * Constants.MAX_SPEED_MperS,
-          applyDeadzone(dX.getAsDouble(), Constants.JOYSTICK_X_DEADZONE) * Constants.MAX_SPEED_MperS,
+        applyDeadzone(-dY.getAsDouble(), Constants.JOYSTICK_X_DEADZONE) * Constants.MAX_SPEED_MperS,
+          applyDeadzone(-dX.getAsDouble(), Constants.JOYSTICK_X_DEADZONE) * Constants.MAX_SPEED_MperS,
             steerAngle,
               driveHeading,
                 triggerPressR.getAsBoolean()

@@ -39,14 +39,14 @@
                 "data": {
                   "pathName": "Middle Return"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "SpeakerFire"
-                }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerFire"
           }
         },
         {
@@ -77,14 +77,14 @@
                 "data": {
                   "pathName": "Far Mid Return"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "SpeakerFire"
-                }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerFire"
           }
         }
       ]

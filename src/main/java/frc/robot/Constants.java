@@ -13,8 +13,8 @@ public final class Constants {
   public static final double JOYSTICK_Y_DEADZONE = 0.15;
   public static final double JOYSTICK_Z_DEADZONE = 0.15;
   public static final double JOYSTICK_Z2_DEADZONE = 0.15;
-  public static final double JOYSTICK_X_SLEW_RATE = 14.0;
-  public static final double JOYSTICK_Y_SLEW_RATE = 14.0;
+  public static final double JOYSTICK_X_SLEW_RATE = 40.0;
+  public static final double JOYSTICK_Y_SLEW_RATE = 40.0;
 
   public static final int DRIVE_CONTROLLER_PORT = 2;
   public static final int STEER_CONTROLLER_PORT = 0;
@@ -59,18 +59,18 @@ public final class Constants {
 
   public static final double[][] SWERVE_STEER_PID_CONSTANTS = {
     // kP   kI   kD  kIz  kFF  kMn  kMx
-		{ 3.0, 0.2e-2, 0.0, 0.0, 0.0, -1.0, 1.0 }, //Front Right
-		{ 3.0, 0.2e-2, 0.0, 0.0, 0.0, -1.0, 1.0 }, //Rear Right
-		{ 3.0, 0.2e-2, 0.0, 0.0, 0.0, -1.0, 1.0 }, //Rear Left
-		{ 3.0, 0.2e-2, 0.0, 0.0, 0.0, -1.0, 1.0 }  //Front Left
+		{ 3.0, 0.2e-1, 0.0, 0.1, 0.0, -1.0, 1.0 }, //Front Right
+		{ 3.0, 0.2e-1, 0.0, 0.1, 0.0, -1.0, 1.0 }, //Rear Right
+		{ 3.0, 0.2e-1, 0.0, 0.1, 0.0, -1.0, 1.0 }, //Rear Left
+		{ 3.0, 0.2e-1, 0.0, 0.1, 0.0, -1.0, 1.0 }  //Front Left
 	};
 
   public static double[][] SWERVE_DRIVE_PID_CONSTANTS = { 
 		// kP   kI   kD  kIz  kFF  kMn  kMx
-		{ 1.5e-2, 0.0, 2.0e-2, 0.0, 0.2, -1.0, 1.0 }, //Front Right
-		{ 1.5e-2, 0.0, 2.0e-2, 0.0, 0.2, -1.0, 1.0 }, //Rear Right
-		{ 1.5e-2, 0.0, 2.0e-2, 0.0, 0.2, -1.0, 1.0 }, //Rear Left
-		{ 1.5e-2, 0.0, 2.0e-2, 0.0, 0.2, -1.0, 1.0 }  //Front Left
+		{ 0.4, 0.0, 0.0, 0.0, 0.215, -1.0, 1.0 }, //Front Right //0.215
+		{ 0.4, 0.0, 0.0, 0.0, 0.215, -1.0, 1.0 }, //Rear Right
+		{ 0.4, 0.0, 0.0, 0.0, 0.215, -1.0, 1.0 }, //Rear Left
+		{ 0.4, 0.0, 0.0, 0.0, 0.215, -1.0, 1.0 }  //Front Left
 	};
 
   public static final double MAX_DRIVETRAIN_SPEED = 5820;
@@ -79,7 +79,7 @@ public final class Constants {
   public static final double[] TAG_ALIGN_ROT_PID = {0.01, 5.0e-2, 0.002};
   public static final double[] TAG_ALIGN_FWD_PID = {0.4, 0.0, 0.006};
 
-  public static final boolean[] STEER_MOTOR_INVERTED = {true, true, true, true};
+  public static final boolean[] STEER_MOTOR_INVERTED = {false, false, false, false};
   public static final boolean[] DRIVE_MOTOR_INVERTED = {false, false, false, false};
 
   /*
@@ -89,7 +89,7 @@ public final class Constants {
   public static final double SWERVE_FRAME_LENGTH = 25.5;
   public static final double SWERVE_RADIUS = Math.sqrt(Math.pow(SWERVE_FRAME_LENGTH, 2) + Math.pow(SWERVE_FRAME_WIDTH, 2));
   public static final double SWERVE_PID_TOLERANCE = 2.8e-4;
-  public static final double DRIVE_POSITION_CONVERSION = (4.0 * 0.0254 * Math.PI) / (6.75);
+  public static final double DRIVE_POSITION_CONVERSION = (0.0986 * Math.PI) / (6.75);
   public static final double DRIVE_VELOCITY_FACTOR = DRIVE_POSITION_CONVERSION / 60;
   public static final double STEER_POSITION_FACTOR = 2.0 * Math.PI / 12.8; 
   public static final double STEER_VELOCITY_FACTOR = STEER_POSITION_FACTOR / 60;

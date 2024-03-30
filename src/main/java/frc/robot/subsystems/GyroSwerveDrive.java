@@ -55,7 +55,7 @@ public class GyroSwerveDrive extends SubsystemBase {
 
     turnController.setIntegratorRange(-0.2, 0.2);
     turnController.enableContinuousInput(0.0, 360.0);
-    turnController.setTolerance(Math.toRadians(0.2));
+    turnController.setTolerance(Math.toRadians(1.0));
 
     kinematics = new SwerveDriveKinematics(
       new Translation2d(Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254),
@@ -69,7 +69,7 @@ public class GyroSwerveDrive extends SubsystemBase {
        getModulePositions(),
         new Pose2d(),
           VecBuilder.fill(0.01, 0.01, 0.05),
-            VecBuilder.fill(0.05, 0.05, 1.0));
+            VecBuilder.fill(0.5, 0.5, 1.0));
 
     trustVision = false;
 
@@ -79,8 +79,8 @@ public class GyroSwerveDrive extends SubsystemBase {
       this::getChassisSpeed,
       this::setModuleStates,
       new HolonomicPathFollowerConfig(
-        new PIDConstants(28, 0.05, 0.0),
-        new PIDConstants(1.4, 0.005, 1.4),
+        new PIDConstants(10, 0.0, 0.1),
+        new PIDConstants(11.0, 0.1, 0.1),
         Constants.MAX_DRIVETRAIN_SPEED * Constants.DRIVE_POSITION_CONVERSION / 60.0,
         Constants.SWERVE_RADIUS / 25.4 / 1000.0,
         new ReplanningConfig()
@@ -117,11 +117,10 @@ public class GyroSwerveDrive extends SubsystemBase {
       if(!m_RobotStates.autonomous && DriverStation.getAlliance().get() == DriverStation.Alliance.Red){
         limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight");
       }
-      if(limelightMeasurement.avgTagDist <= 4)updateVisionPoseEstimator(limelightMeasurement.pose, limelightMeasurement.timestampSeconds, limelightMeasurement.tagCount);
+      if(limelightMeasurement.avgTagDist <= 3)updateVisionPoseEstimator(limelightMeasurement.pose, limelightMeasurement.timestampSeconds, limelightMeasurement.tagCount);
     }
-    for(int i = 0; i<4; i++){
-      swerveMod[i].output();
-    }
+    
+      swerveMod[0].output();
 
     poseEstimator.updateWithTime(
       Timer.getFPGATimestamp(),
@@ -151,8 +150,8 @@ public class GyroSwerveDrive extends SubsystemBase {
     //10 3900 -0.1
     //0 4500 0.0
     Speakerdistance = Speakerdistance >= 0.0 ? Speakerdistance : 0.0;
-    m_RobotStates.inSpeaker = Speakerdistance <= 20;
-    m_RobotStates.speakSpeed = Speakerdistance >= 3 ? 1.01 * (-259.36 * Math.log(0.00721146 * (Speakerdistance) + 0.00791717) + 3245.03) : 4800;
+    m_RobotStates.inSpeaker = Speakerdistance <= 15;
+    m_RobotStates.speakSpeed = Speakerdistance >= 3 ? 1.1 * (-259.36 * Math.log(0.00721146 * (Speakerdistance) + 0.00791717) + 3245.03) : 4600;
   }
 
   public Pose2d getPose(){
@@ -188,7 +187,7 @@ public class GyroSwerveDrive extends SubsystemBase {
   }
   
   public void setModuleStates(ChassisSpeeds chassisSpeeds) {
-    /*
+    //*
     SwerveModuleState[] desiredStates = kinematics.toSwerveModuleStates(secondOrderKinematics(chassisSpeeds));
     //*/SwerveModuleState[] desiredStates = kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(chassisSpeeds, 0.02));
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.MAX_SPEED_MperS);
@@ -222,9 +221,9 @@ public class GyroSwerveDrive extends SubsystemBase {
     //ySpeed = slewY.calculate(ySpeed);
 
     Pose2d position = getPose();
-    if(speakerLock){setAngle = -Math.toDegrees(Math.atan2(position.getY() - 5.45, position.getY()));}
+    if(speakerLock){setAngle = Math.toDegrees(Math.atan2(position.getY() - 5.45, position.getY()));}
     double rot = 0.0;
-    if(lock) rot = turnController.calculate(setAngle, position.getRotation().getDegrees());
+    if(lock || speakerLock) rot = -turnController.calculate(setAngle, position.getRotation().getDegrees());
     rot *= Constants.MAX_SPEED_MperS / new Rotation2d(Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254).getRadians();
     setModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, position.getRotation()));
   }

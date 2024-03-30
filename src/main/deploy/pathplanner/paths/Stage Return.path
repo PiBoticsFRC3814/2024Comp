@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.494174579798092,
-        "y": 4.163146758597556
+        "x": 1.1626828004249845,
+        "y": 3.8706540120918724
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.1139340093407042,
-        "y": 4.670134185874073
+        "x": 0.7044441642327478,
+        "y": 4.484888779753807
       },
       "prevControl": {
-        "x": 1.5933943414807419,
-        "y": 4.062038154867196
+        "x": 1.183904496372787,
+        "y": 3.8767927487469303
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,15 +32,15 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.71,
-    "maxAcceleration": 6.5,
+    "maxVelocity": 4.17,
+    "maxAcceleration": 5.0,
     "maxAngularVelocity": 200.0,
-    "maxAngularAcceleration": 360.0
+    "maxAngularAcceleration": 400.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -40.878479220743316,
-    "rotateFast": false
+    "rotation": -57.38075692880711,
+    "rotateFast": true
   },
   "reversed": false,
   "folder": "Stage",
