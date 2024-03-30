@@ -57,6 +57,16 @@ public class GyroSwerveDriveCommand extends Command {
     return (input < 0.0 ? -result : result);
   }
 
+  private double expo(double input){
+    double unsignIn = Math.abs(input);
+    double d = 1.0;
+    double f = Constants.MAX_SPEED_MperS;
+    double g = 0.7;
+    double h = unsignIn * (Math.pow(unsignIn, 5.0) * g + unsignIn * (1 - g));
+    double curved = ((d * unsignIn) + ((f - d) * h));
+    return Math.signum(input) * curved;
+  }
+
   @Override
   public void execute() {
     //*
@@ -64,8 +74,8 @@ public class GyroSwerveDriveCommand extends Command {
     driveHeading = (0.5625 < dZ.getAsDouble() * dZ.getAsDouble() + dZ2.getAsDouble() * dZ2.getAsDouble());
     steerAngle = steerAngle < 0.0 ? 360 + steerAngle : steerAngle;
     drivetrain.drive(
-        applyDeadzone(-dY.getAsDouble(), Constants.JOYSTICK_X_DEADZONE) * Constants.MAX_SPEED_MperS,
-          applyDeadzone(-dX.getAsDouble(), Constants.JOYSTICK_X_DEADZONE) * Constants.MAX_SPEED_MperS,
+        expo(applyDeadzone(-dY.getAsDouble(), Constants.JOYSTICK_X_DEADZONE)),
+          expo(applyDeadzone(-dX.getAsDouble(), Constants.JOYSTICK_X_DEADZONE)),
             steerAngle,
               driveHeading,
                 triggerPressR.getAsBoolean()

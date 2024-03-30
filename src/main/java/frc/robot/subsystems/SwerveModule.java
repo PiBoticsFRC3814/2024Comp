@@ -139,8 +139,7 @@ public class SwerveModule {
 	}
     	}
 	
-	  private double getCosineCompensatedVelocity(SwerveModuleState desiredState)
-  {
+	private double getCosineCompensatedVelocity(SwerveModuleState desiredState){
     double cosineScalar = 1.0;
     // Taken from the CTRE SwerveModule class.
     // https://api.ctr-electronics.com/phoenix6/release/java/src-html/com/ctre/phoenix6/mechanisms/swerve/SwerveModule.html#line.46
