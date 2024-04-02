@@ -69,7 +69,7 @@ public class GyroSwerveDrive extends SubsystemBase {
        getModulePositions(),
         new Pose2d(),
           VecBuilder.fill(0.01, 0.01, 0.05),
-            VecBuilder.fill(0.5, 0.5, 1.0));
+            VecBuilder.fill(0.1, 0.1, 1.0));
 
     trustVision = false;
 
@@ -79,8 +79,8 @@ public class GyroSwerveDrive extends SubsystemBase {
       this::getChassisSpeed,
       this::setModuleStates,
       new HolonomicPathFollowerConfig(
-        new PIDConstants(10, 0.0, 0.1),
-        new PIDConstants(11.0, 0.1, 0.1),
+        new PIDConstants(10, 0.0, 0.0),
+        new PIDConstants(11.0, 0., 0.1),
         Constants.MAX_DRIVETRAIN_SPEED * Constants.DRIVE_POSITION_CONVERSION / 60.0,
         Constants.SWERVE_RADIUS / 25.4 / 1000.0,
         new ReplanningConfig()
@@ -109,7 +109,7 @@ public class GyroSwerveDrive extends SubsystemBase {
       swerveMod[2].getState(),
       swerveMod[3].getState());
   }
-
+// cut my life into pieces this is my last resort!! :p -bleh
   @Override
   public void periodic() {
     if(LimelightHelpers.getTV("limelight")){
@@ -150,7 +150,7 @@ public class GyroSwerveDrive extends SubsystemBase {
     //10 3900 -0.1
     //0 4500 0.0
     Speakerdistance = Speakerdistance >= 0.0 ? Speakerdistance : 0.0;
-    m_RobotStates.inSpeaker = Speakerdistance <= 15;
+    m_RobotStates.inSpeaker = Speakerdistance <= 24;
     m_RobotStates.speakSpeed = Speakerdistance >= 3 ? 1.1 * (-259.36 * Math.log(0.00721146 * (Speakerdistance) + 0.00791717) + 3245.03) : 4600;
   }
 

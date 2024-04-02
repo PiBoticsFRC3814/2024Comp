@@ -59,7 +59,7 @@ public class GyroSwerveDriveCommand extends Command {
 
   private double expo(double input){
     double unsignIn = Math.abs(input);
-    double d = 1.0;
+    double d = Constants.MAX_SPEED_MperS / 2.0;
     double f = Constants.MAX_SPEED_MperS;
     double g = 0.7;
     double h = unsignIn * (Math.pow(unsignIn, 5.0) * g + unsignIn * (1 - g));
