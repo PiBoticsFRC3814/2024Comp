@@ -24,6 +24,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
@@ -49,8 +50,8 @@ public class SwerveModule {
 		driveMotor.setIdleMode(IdleMode.kBrake);
 		driveMotor.enableVoltageCompensation(Constants.SWERVE_VOLT_COMP);
 		driveMotor.setInverted( Constants.DRIVE_MOTOR_INVERTED[swerveModIndex] );
-		driveMotor.setOpenLoopRampRate( 0.4 );
-		driveMotor.setSmartCurrentLimit(50, 40);
+		driveMotor.setOpenLoopRampRate( 0.2 );
+		driveMotor.setSmartCurrentLimit(45, 35);
 
 		driveVelocityPIDController = driveMotor.getPIDController();
 		driveVelocityPIDController.setP(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][0]);
@@ -72,9 +73,10 @@ public class SwerveModule {
 		steerMotor.enableVoltageCompensation(Constants.SWERVE_VOLT_COMP);
 		steerMotor.setIdleMode(IdleMode.kBrake);
 		steerMotor.setInverted( Constants.STEER_MOTOR_INVERTED[swerveModIndex] );
-		steerMotor.setSmartCurrentLimit(40, 20);
+		steerMotor.setSmartCurrentLimit(25, 25);
 
 		steerPIDController = steerMotor.getPIDController();
+
 		steerPIDController.setP(Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][0]);
 		steerPIDController.setI(Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][1]);
 		steerPIDController.setD(Constants.SWERVE_STEER_PID_CONSTANTS[swerveModIndex][2]);
@@ -127,15 +129,17 @@ public class SwerveModule {
 	public void setDesiredState(SwerveModuleState desiredState) {
         // Optimize the reference state to avoid spinning further than 90 degrees
         SwerveModuleState state = SwerveModuleState.optimize(desiredState, new Rotation2d(getStateAngle()));
-	if(((Math.abs(state.speedMetersPerSecond) < 0.05) && Math.abs(state.angle.getRadians() - getStateAngle()) < 0.02 ) && steerEncoder.getVelocity() < 0.1){
-		driveMotor.set(0);
+	if((Math.abs(state.angle.getRadians() - getStateAngle()) < Math.toRadians(1.0) ) && steerEncoder.getVelocity() < Math.toRadians(5.0)){
 		steerMotor.set(0);
 	} else {
-		double velocity = getCosineCompensatedVelocity(state);
-
-        	driveVelocityPIDController.setReference(velocity, ControlType.kVelocity);
+		setReferenceAngle(state.angle.getRadians());
+	}
+	if(Math.abs(state.speedMetersPerSecond) < 0.05){
+		driveMotor.set(0);
+	} else {
+		double velocity = RobotState.isAutonomous() ? getCosineCompensatedVelocity(state) : state.speedMetersPerSecond;
+        driveVelocityPIDController.setReference(velocity, ControlType.kVelocity);
         	//driveVelocityPIDController.setReference(Constants.MAX_SPEED_MperS, ControlType.kVelocity);
-        	setReferenceAngle(state.angle.getRadians());
 	}
     	}
 	

@@ -1,6 +1,12 @@
 {
   "version": 1.0,
-  "startingPose": null,
+  "startingPose": {
+    "position": {
+      "x": 0.7336934388833163,
+      "y": 4.4361399886695265
+    },
+    "rotation": -59.47029410006581
+  },
   "command": {
     "type": "sequential",
     "data": {
@@ -56,7 +62,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Far Right Pickup"
+                  "pathName": "Right Right Pickup"
                 }
               },
               {

@@ -44,6 +44,7 @@ public class GyroSwerveDrive extends SubsystemBase {
 
   public boolean trustVision;
   public Pose2d currentPose;
+  double avgTrust;
 
   private SwerveModule[] swerveMod = {
     new SwerveModule(0), new SwerveModule(1), new SwerveModule(2), new SwerveModule(3)
@@ -68,8 +69,8 @@ public class GyroSwerveDrive extends SubsystemBase {
       Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis())),
        getModulePositions(),
         new Pose2d(),
-          VecBuilder.fill(0.01, 0.01, 0.05),
-            VecBuilder.fill(0.1, 0.1, 1.0));
+          VecBuilder.fill(0.1, 0.1, 0.05),
+            VecBuilder.fill(0.5, 0.5, 1.0));
 
     trustVision = false;
 
@@ -79,9 +80,9 @@ public class GyroSwerveDrive extends SubsystemBase {
       this::getChassisSpeed,
       this::setModuleStates,
       new HolonomicPathFollowerConfig(
-        new PIDConstants(10, 0.0, 0.0),
-        new PIDConstants(11.0, 0., 0.1),
-        Constants.MAX_DRIVETRAIN_SPEED * Constants.DRIVE_POSITION_CONVERSION / 60.0,
+        new PIDConstants(9, 0.0, 0.3),
+        new PIDConstants(11.0, 0.0, 0.1),
+        Constants.MAX_SPEED_MperS,
         Constants.SWERVE_RADIUS / 25.4 / 1000.0,
         new ReplanningConfig()
       ),
@@ -114,10 +115,14 @@ public class GyroSwerveDrive extends SubsystemBase {
   public void periodic() {
     if(LimelightHelpers.getTV("limelight")){
       LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-      if(!m_RobotStates.autonomous && DriverStation.getAlliance().get() == DriverStation.Alliance.Red){
-        limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight");
+      try{
+        avgTrust = 0;
+        for(int i = 0; i<limelightMeasurement.tagCount; i++) avgTrust += limelightMeasurement.rawFiducials[i].ambiguity;
+        avgTrust/=limelightMeasurement.tagCount;
+        if(limelightMeasurement.avgTagDist <= 3)updateVisionPoseEstimator(limelightMeasurement.pose, limelightMeasurement.timestampSeconds, avgTrust);
+      } catch(Exception e){
+        System.err.println(e);
       }
-      if(limelightMeasurement.avgTagDist <= 3)updateVisionPoseEstimator(limelightMeasurement.pose, limelightMeasurement.timestampSeconds, limelightMeasurement.tagCount);
     }
     
       swerveMod[0].output();
@@ -189,7 +194,7 @@ public class GyroSwerveDrive extends SubsystemBase {
   public void setModuleStates(ChassisSpeeds chassisSpeeds) {
     //*
     SwerveModuleState[] desiredStates = kinematics.toSwerveModuleStates(secondOrderKinematics(chassisSpeeds));
-    //*/SwerveModuleState[] desiredStates = kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(chassisSpeeds, 0.02));
+    if(RobotState.isAutonomous()) desiredStates = kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(chassisSpeeds, 0.02));
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.MAX_SPEED_MperS);
     swerveMod[0].setDesiredState(desiredStates[0]);
     swerveMod[1].setDesiredState(desiredStates[1]);
@@ -235,14 +240,17 @@ public class GyroSwerveDrive extends SubsystemBase {
     m_RobotStates.gyroReset++;
   }
 
-  public void updateVisionPoseEstimator(Pose2d visionEstimate, double timestamp, int tagNumber){
+  public void updateVisionPoseEstimator(Pose2d visionEstimate, double timestamp, double trust){
     //ramp measurement trust based on robot distance
     //poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.1 * Math.pow(15, distance), 0.1 * Math.pow(15, distance), Units.degreesToRadians(20)));
     //if(tagNumber == 1)poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.8,.8, Math.toRadians(20)));
     //if(tagNumber > 1)poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.1,.1,Math.toRadians(5)));
     //0.04 0.04 5
     //0.8 0.8 20
-    poseEstimator.addVisionMeasurement(visionEstimate, timestamp);
+    if(trust <= 0.8 && 1.0 >= Math.sqrt(getChassisSpeed().vxMetersPerSecond * getChassisSpeed().vxMetersPerSecond + getChassisSpeed().vyMetersPerSecond * getChassisSpeed().vyMetersPerSecond)){
+      poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.1 + 5 * (trust <= 0.3 ? 0.0 : trust) ,.1 + 5 * (trust <= 0.3 ? 0.0 : trust),Math.toRadians(5) + 20 * trust));
+      poseEstimator.addVisionMeasurement(visionEstimate, timestamp);
+    }
   }
 
   private double applyDeadzone(double input, double deadzone) {

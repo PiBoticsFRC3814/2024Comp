@@ -13,8 +13,8 @@ public final class Constants {
   public static final double JOYSTICK_Y_DEADZONE = 0.15;
   public static final double JOYSTICK_Z_DEADZONE = 0.15;
   public static final double JOYSTICK_Z2_DEADZONE = 0.15;
-  public static final double JOYSTICK_X_SLEW_RATE = 40.0;
-  public static final double JOYSTICK_Y_SLEW_RATE = 40.0;
+  public static final double JOYSTICK_X_SLEW_RATE = 100.0;
+  public static final double JOYSTICK_Y_SLEW_RATE = 100.0;
 
   public static final int DRIVE_CONTROLLER_PORT = 2;
   public static final int STEER_CONTROLLER_PORT = 0;
@@ -67,10 +67,10 @@ public final class Constants {
 
   public static double[][] SWERVE_DRIVE_PID_CONSTANTS = { 
 		// kP   kI   kD  kIz  kFF  kMn  kMx
-		{ 0.4, 0.0, 0.0, 0.0, 0.215, -1.0, 1.0 }, //Front Right //0.215
-		{ 0.4, 0.0, 0.0, 0.0, 0.215, -1.0, 1.0 }, //Rear Right
-		{ 0.4, 0.0, 0.0, 0.0, 0.215, -1.0, 1.0 }, //Rear Left
-		{ 0.4, 0.0, 0.0, 0.0, 0.215, -1.0, 1.0 }  //Front Left
+		{ 0.4, 0.0, 0.2e-2, 0.0, 0.215, -1.0, 1.0 }, //Front Right //0.215
+		{ 0.4, 0.0, 0.2e-2, 0.0, 0.215, -1.0, 1.0 }, //Rear Right
+		{ 0.4, 0.0, 0.2e-2, 0.0, 0.215, -1.0, 1.0 }, //Rear Left
+		{ 0.4, 0.0, 0.2e-2, 0.0, 0.215, -1.0, 1.0 }  //Front Left
 	};
 
   public static final double MAX_DRIVETRAIN_SPEED = 5820;
@@ -80,7 +80,7 @@ public final class Constants {
   public static final double[] TAG_ALIGN_FWD_PID = {0.4, 0.0, 0.006};
 
   public static final boolean[] STEER_MOTOR_INVERTED = {false, false, false, false};
-  public static final boolean[] DRIVE_MOTOR_INVERTED = {false, false, false, false};
+  public static final boolean[] DRIVE_MOTOR_INVERTED = {false, true, false, false};
 
   /*
    * Swerve constants for swerve module calculations

@@ -4,9 +4,12 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -134,7 +137,8 @@ public class Robot extends TimedRobot {
             () -> m_robotContainer.driveStick.getRightTriggerAxis() >= 0.8,
             () -> m_robotContainer.driveStick.getLeftTriggerAxis() >= 0.8,
             m_robotContainer.m_gyro,
-            m_robotContainer.m_gyroSwerveDrive));
+            m_robotContainer.m_gyroSwerveDrive,
+            m_robotContainer.m_robotStates));
     m_robotContainer.m_gyroSwerveDrive.resetModules();
     LimelightHelpers.setPipelineIndex("limelight", 0);
     m_robotContainer.m_robotStates.autonomous = false;

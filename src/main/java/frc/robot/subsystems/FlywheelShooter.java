@@ -30,7 +30,7 @@ public class FlywheelShooter extends SubsystemBase {
 		topPIDShoot.setD(Constants.SHOOT_PID[0][2]);
 		topPIDShoot.setIZone(Constants.SHOOT_PID[0][3]);
 		topPIDShoot.setFF(Constants.SHOOT_PID[0][4]);
-    topShooter.setOpenLoopRampRate( 0.2 );
+    //topShooter.setOpenLoopRampRate( 0.2 );
 		topShooter.setSmartCurrentLimit(50, 40);
     topShooter.setInverted(true);
 
@@ -42,7 +42,7 @@ public class FlywheelShooter extends SubsystemBase {
 		botPIDShoot.setD(Constants.SHOOT_PID[1][2]);
 		botPIDShoot.setIZone(Constants.SHOOT_PID[1][3]);
 		botPIDShoot.setFF(Constants.SHOOT_PID[1][4]);
-    botShooter.setOpenLoopRampRate( 0.2 );
+    //botShooter.setOpenLoopRampRate( 0.2 );
 		botShooter.setSmartCurrentLimit(50, 40);
 
     speed = botShooter.getEncoder();

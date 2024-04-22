@@ -4,12 +4,14 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.GyroSwerveDrive;
+import frc.robot.subsystems.RobotStates;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -26,6 +28,7 @@ public class GyroSwerveDriveCommand extends Command {
   double steerAngle;
   BooleanSupplier triggerPressR;
   BooleanSupplier triggerPressL;
+  RobotStates robotStates;
 
   public GyroSwerveDriveCommand(
       DoubleSupplier dX,
@@ -36,7 +39,8 @@ public class GyroSwerveDriveCommand extends Command {
       BooleanSupplier triggerPressR,
       BooleanSupplier triggerPressL,
       ADIS16470_IMU imu,
-      GyroSwerveDrive gyroSwerveDrive
+      GyroSwerveDrive gyroSwerveDrive,
+      RobotStates robotStates
       ) {
     this.dX = dX;
     this.dY = dY;
@@ -47,6 +51,7 @@ public class GyroSwerveDriveCommand extends Command {
     drivetrain = gyroSwerveDrive;
     this.triggerPressR = triggerPressR;
     this.triggerPressL = triggerPressL;
+    this.robotStates = robotStates;
 
     addRequirements(drivetrain);
   }
@@ -60,7 +65,7 @@ public class GyroSwerveDriveCommand extends Command {
   private double expo(double input){
     double unsignIn = Math.abs(input);
     double d = Constants.MAX_SPEED_MperS / 2.0;
-    double f = Constants.MAX_SPEED_MperS;
+    double f = 3.814;//Constants.MAX_SPEED_MperS;
     double g = 0.7;
     double h = unsignIn * (Math.pow(unsignIn, 5.0) * g + unsignIn * (1 - g));
     double curved = ((d * unsignIn) + ((f - d) * h));
@@ -70,18 +75,21 @@ public class GyroSwerveDriveCommand extends Command {
   @Override
   public void execute() {
     //*
-    steerAngle = Math.atan2(applyDeadzone(-dZ.getAsDouble(), Constants.JOYSTICK_Z_DEADZONE), applyDeadzone(dZ2.getAsDouble(), Constants.JOYSTICK_Z2_DEADZONE)) / Math.PI * 180.0;
+    double invert = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? -1.0 : 1.0;
+    steerAngle = Math.atan2(applyDeadzone(-dZ.getAsDouble() * invert, Constants.JOYSTICK_Z_DEADZONE), applyDeadzone(dZ2.getAsDouble() * invert, Constants.JOYSTICK_Z2_DEADZONE)) / Math.PI * 180.0;
     driveHeading = (0.5625 < dZ.getAsDouble() * dZ.getAsDouble() + dZ2.getAsDouble() * dZ2.getAsDouble());
     steerAngle = steerAngle < 0.0 ? 360 + steerAngle : steerAngle;
+    double mult = triggerPressR.getAsBoolean() ? 1.0 : 0.5;
+    //*
     drivetrain.drive(
-        expo(applyDeadzone(-dY.getAsDouble(), Constants.JOYSTICK_X_DEADZONE)),
-          expo(applyDeadzone(-dX.getAsDouble(), Constants.JOYSTICK_X_DEADZONE)),
+        applyDeadzone(-dY.getAsDouble() * invert, Constants.JOYSTICK_X_DEADZONE) * Constants.MAX_SPEED_MperS * mult,
+          applyDeadzone(-dX.getAsDouble() * invert, Constants.JOYSTICK_X_DEADZONE) * Constants.MAX_SPEED_MperS * mult,
             steerAngle,
               driveHeading,
-                triggerPressR.getAsBoolean()
+                triggerPressL.getAsBoolean()
     );
     //*/
-    //System.out.println(dX.getAsDouble() * Constants.MAX_SPEED_MperS);
+    //System.out.println(applyDeadzone(-dY.getAsDouble() * invert, Constants.JOYSTICK_X_DEADZONE) * Constants.MAX_SPEED_MperS * mult);
     //drivetrain.setModuleStates(new ChassisSpeeds(applyDeadzone(dY.getAsDouble(), Constants.JOYSTICK_X_DEADZONE) * Constants.MAX_SPEED_MperS, applyDeadzone(dX.getAsDouble(), Constants.JOYSTICK_X_DEADZONE) * Constants.MAX_SPEED_MperS, applyDeadzone(dZ.getAsDouble(), Constants.JOYSTICK_X_DEADZONE)));
   }
 

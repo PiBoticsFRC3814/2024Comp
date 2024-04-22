@@ -46,11 +46,11 @@ public class ManualShoot extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(timerSpeak.get() >= 0.3) shooter.fireDifference(4100, 0.0);
-    if(((!intake.gotNote) || timerSpeak.get() >= 0.3) && shooter.speed.getVelocity() <= (4100 - 4100 * 0.1) * 0.95){
+    if(timerSpeak.get() >= 0.3) shooter.fireDifference(4200, 0.0);
+    if(((!intake.gotNote) || timerSpeak.get() >= 0.3) && shooter.speed.getVelocity() <= (4200 * 0.95)){
       intake.stop();
     }
-    if((shooter.speed.getVelocity() >= (4100 - 4100 * 0.1) * 0.95) && (!robotState.autonomous || robotState.inSpeaker)){
+    if((shooter.speed.getVelocity() >= 4200  * 0.95) && (!robotState.autonomous || robotState.inSpeaker)){
       if(timeSinceShoot == 0) timeSinceShoot = Timer.getFPGATimestamp();
       intake.shoot();
     }

@@ -95,6 +95,7 @@ public class RobotContainer {
     chooserFirst.addOption("Stage Side", "Right Auto");
     chooserFirst.addOption("Shoot test", "New Auto");
     chooserFirst.addOption("Fun", "YESSSSS");
+    chooserFirst.addOption("SCRAMMMM", "GetOut");
     //setupShuffleboard();
     //*/
 
