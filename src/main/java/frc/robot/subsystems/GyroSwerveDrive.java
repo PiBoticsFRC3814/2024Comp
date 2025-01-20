@@ -48,7 +48,7 @@ public class GyroSwerveDrive extends SubsystemBase {
 
   private SwerveModule[] swerveMod = {
     new SwerveModule(0), new SwerveModule(1), new SwerveModule(2), new SwerveModule(3)
-  };
+  }; // this builds the swerve module in entirety (both drive motor and steer motor) from the SwerveModule.java -- builds 4 of them based on normmal number of swerve modules
 
   public GyroSwerveDrive(RobotStates robotStates, ADIS16470_IMU gyro) {
     m_RobotStates = robotStates;
@@ -90,6 +90,7 @@ public class GyroSwerveDrive extends SubsystemBase {
                     // Boolean supplier that controls when the path will be mirrored for the red alliance
                     // This will flip the path being followed to the red side of the field.
                     // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+                    // Mote this needs to be looked at per game since it can be morrored or rotated red vs blue.  2025 is rotated not mirrored.
 
                     var alliance = DriverStation.getAlliance();
                     if (alliance.isPresent()) {
