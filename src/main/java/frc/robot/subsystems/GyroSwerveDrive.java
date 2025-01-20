@@ -63,7 +63,7 @@ public class GyroSwerveDrive extends SubsystemBase {
        new Translation2d(Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, -Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254),
         new Translation2d(-Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254),
          new Translation2d(-Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, -Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254)
-    );
+    ); //physical locations of the mnodules -- +x towards front, +y towards left -- appears to be in millimeters 0.0245 divider -- this should be usable to tell us if our mmodules are called out correctly.
     poseEstimator = new SwerveDrivePoseEstimator(
       kinematics, 
       Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis())),
