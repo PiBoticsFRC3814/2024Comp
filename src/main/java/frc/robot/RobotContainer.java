@@ -94,18 +94,21 @@ public class RobotContainer {
     chooserFirst.addOption("Amp Side", "Left Auto");
     chooserFirst.addOption("Stage Side", "Right Auto");
     chooserFirst.addOption("Shoot test", "New Auto");
-    chooserFirst.addOption("Fun", "YESSSSS");
+    chooserFirst.addOption("4 Note Front", "YESSSSS");
     chooserFirst.addOption("SCRAMMMM", "GetOut");
+    chooserFirst.addOption("Front Left", "Front Left");
+    chooserFirst.addOption("Front Right", "Front Right");
+    chooserFirst.addOption("Front Middle", "Front Middle");
     //setupShuffleboard();
     //*/
 
     configureBindings();
   }
-
+  
   //now fixed
 
   /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the-
+   *Use this method to define your trigger->command mappings. Triggers can be created via the-
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
    * predicate, or via the named factories in {@link
    * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
@@ -129,6 +132,7 @@ public class RobotContainer {
     new JoystickButton(controlStick, Button.kB.value).whileTrue(new ManualShoot(m_shooter, m_intake, m_robotStates));
   }
 
+  
   public void setupShuffleboard(){
     Shuffleboard.getTab("Test")
     .add("Gyro", m_gyro.getAngle(m_gyro.getYawAxis()))

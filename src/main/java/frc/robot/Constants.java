@@ -41,11 +41,11 @@ public final class Constants {
 
   /*
    * Swerve module motor and encoder ids
-   * { Front Right, Back Right, Back Left, Front Left }
+   * { Front Right, Back Right, Back Left, Front Left } -- THIS IS WRONG?
    */
-  public static final int[] SWERVE_DRIVE_MOTOR_IDS = {21, 22, 20, 23};//{22, 23, 20, 21};
-  public static final int[] SWERVE_STEER_MOTOR_IDS = {31, 32, 30, 33};//{32, 33, 30, 31};
-  public static final int[] SWERVE_ENCODER_IDS =     {41, 42, 40, 43};//{42, 43, 40, 41};
+  public static final int[] SWERVE_DRIVE_MOTOR_IDS = {21, 22, 20, 23};//{22, 23, 20, 21}; {21, 22, 20, 23}
+  public static final int[] SWERVE_STEER_MOTOR_IDS = {31, 32, 30, 33};//{32, 33, 30, 31}; {31, 32, 30, 33};
+  public static final int[] SWERVE_ENCODER_IDS =     {41, 42, 40, 43};//{42, 43, 40, 41}; {41, 42, 40, 43};
 
   public static final int swerveModuleNumber = 4;
 
@@ -59,10 +59,10 @@ public final class Constants {
 
   public static final double[][] SWERVE_STEER_PID_CONSTANTS = {
     // kP   kI   kD  kIz  kFF  kMn  kMx
-		{ 3.0, 0.2e-1, 0.0, 0.1, 0.0, -1.0, 1.0 }, //Front Right
-		{ 3.0, 0.2e-1, 0.0, 0.1, 0.0, -1.0, 1.0 }, //Rear Right
-		{ 3.0, 0.2e-1, 0.0, 0.1, 0.0, -1.0, 1.0 }, //Rear Left
-		{ 3.0, 0.2e-1, 0.0, 0.1, 0.0, -1.0, 1.0 }  //Front Left
+		{ 1.0, 0.2e-1, 0.0, 0.1, 0.0, -1.0, 1.0 }, //Front Right
+		{ 1.0, 0.2e-1, 0.0, 0.1, 0.0, -1.0, 1.0 }, //Rear Right
+		{ 1.0, 0.2e-1, 0.0, 0.1, 0.0, -1.0, 1.0 }, //Rear Left
+		{ 1.0, 0.2e-1, 0.0, 0.1, 0.0, -1.0, 1.0 }  //Front Left
 	};
 
   public static double[][] SWERVE_DRIVE_PID_CONSTANTS = { 
@@ -80,7 +80,7 @@ public final class Constants {
   public static final double[] TAG_ALIGN_FWD_PID = {0.4, 0.0, 0.006};
 
   public static final boolean[] STEER_MOTOR_INVERTED = {false, false, false, false};
-  public static final boolean[] DRIVE_MOTOR_INVERTED = {false, true, false, false};
+  public static final boolean[] DRIVE_MOTOR_INVERTED = {false, true, true, true};
 
   /*
    * Swerve constants for swerve module calculations

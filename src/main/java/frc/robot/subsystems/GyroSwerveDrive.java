@@ -221,7 +221,7 @@ public class GyroSwerveDrive extends SubsystemBase {
     );
   }
 
-  public void drive(double xSpeed, double ySpeed, double setAngle, boolean lock, boolean speakerLock) {
+  public void drive(double xSpeed, double ySpeed, double setAngle, boolean lock, boolean speakerLock, double zSpeed) {
     //xSpeed = slewX.calculate(xSpeed);
     //ySpeed = slewY.calculate(ySpeed);
 
@@ -230,7 +230,7 @@ public class GyroSwerveDrive extends SubsystemBase {
     double rot = 0.0;
     if(lock || speakerLock) rot = -turnController.calculate(setAngle, position.getRotation().getDegrees());
     rot *= Constants.MAX_SPEED_MperS / new Rotation2d(Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254).getRadians();
-    setModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, position.getRotation()));
+    setModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, zSpeed, position.getRotation()));
   }
 
 

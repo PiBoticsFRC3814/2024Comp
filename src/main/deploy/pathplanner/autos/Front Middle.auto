@@ -38,52 +38,14 @@
                 "data": {
                   "pathName": "Middle Return"
                 }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SpeakerFire"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Far Mid Pickup"
-                }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "intakeRun"
+                  "name": "SpeakerFire"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Far Mid Return"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SpeakerFire"
           }
         }
       ]
