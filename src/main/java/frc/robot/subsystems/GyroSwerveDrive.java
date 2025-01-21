@@ -59,18 +59,19 @@ public class GyroSwerveDrive extends SubsystemBase {
     turnController.setTolerance(Math.toRadians(1.0));
 
     kinematics = new SwerveDriveKinematics(
-      new Translation2d(Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254),
-       new Translation2d(Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, -Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254),
-        new Translation2d(-Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254),
-         new Translation2d(-Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, -Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254)
+      new Translation2d(Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254),     //FL
+       new Translation2d(Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, -Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254),   //FR
+        new Translation2d(-Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254),  //RL
+         new Translation2d(-Constants.SWERVE_FRAME_LENGTH / 2.0 * 0.0254, -Constants.SWERVE_FRAME_WIDTH / 2.0 * 0.0254) //RR
     ); //physical locations of the mnodules -- +x towards front, +y towards left -- appears to be in millimeters 0.0245 divider -- this should be usable to tell us if our mmodules are called out correctly.
+       //From Alex: this is correct. WPiLib is FL, FR, RL, RR
     poseEstimator = new SwerveDrivePoseEstimator(
       kinematics, 
       Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis())),
        getModulePositions(),
         new Pose2d(),
           VecBuilder.fill(0.1, 0.1, 0.05),
-            VecBuilder.fill(0.5, 0.5, 1.0));
+            VecBuilder.fill(0.5, 0.5, 1.0)); //Alex: This needs to be properly setup. Look up Extended Kalman Filter for tuning
 
     trustVision = false;
 
@@ -106,10 +107,11 @@ public class GyroSwerveDrive extends SubsystemBase {
 
   public ChassisSpeeds getChassisSpeed() {
     return kinematics.toChassisSpeeds(
-      swerveMod[0].getState(),
-      swerveMod[1].getState(),
-      swerveMod[2].getState(),
-      swerveMod[3].getState());
+      swerveMod[0].getState(),  //FL
+      swerveMod[1].getState(),  //FR
+      swerveMod[2].getState(),  //RL
+      swerveMod[3].getState()   //RR
+    );
   }
 // cut my life into pieces this is my last resort!! :p -bleh
   @Override
@@ -166,19 +168,19 @@ public class GyroSwerveDrive extends SubsystemBase {
 
   private SwerveModulePosition[] getModulePositions(){
     SwerveModulePosition[] positions = new SwerveModulePosition[4];
-    positions[0] = swerveMod[0].getPosition();
-    positions[1] = swerveMod[1].getPosition();
-    positions[2] = swerveMod[2].getPosition();
-    positions[3] = swerveMod[3].getPosition();
+    positions[0] = swerveMod[0].getPosition();  //FL
+    positions[1] = swerveMod[1].getPosition();  //FR
+    positions[2] = swerveMod[2].getPosition();  //RL
+    positions[3] = swerveMod[3].getPosition();  //RR
     return positions;
   }
 
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.MAX_SPEED_MperS);
-    swerveMod[0].setDesiredState(desiredStates[0]);
-    swerveMod[1].setDesiredState(desiredStates[1]);
-    swerveMod[2].setDesiredState(desiredStates[2]);
-    swerveMod[3].setDesiredState(desiredStates[3]);
+    swerveMod[0].setDesiredState(desiredStates[0]);  //FL
+    swerveMod[1].setDesiredState(desiredStates[1]);  //FR
+    swerveMod[2].setDesiredState(desiredStates[2]);  //RL
+    swerveMod[3].setDesiredState(desiredStates[3]);  //RR
     //m_FLModule.setDesiredState(desiredStates[0]);
     //m_FRModule.setDesiredState(desiredStates[1]);
     //m_RLModule.setDesiredState(desiredStates[2]);
@@ -186,10 +188,10 @@ public class GyroSwerveDrive extends SubsystemBase {
   }
 
   public void resetModules(){
-    swerveMod[0].resetModule();
-    swerveMod[1].resetModule();
-    swerveMod[2].resetModule();
-    swerveMod[3].resetModule();
+    swerveMod[0].resetModule();  //FL
+    swerveMod[1].resetModule();  //FR
+    swerveMod[2].resetModule();  //RL
+    swerveMod[3].resetModule();  //RR
   }
   
   public void setModuleStates(ChassisSpeeds chassisSpeeds) {
@@ -197,10 +199,10 @@ public class GyroSwerveDrive extends SubsystemBase {
     SwerveModuleState[] desiredStates = kinematics.toSwerveModuleStates(secondOrderKinematics(chassisSpeeds));
     if(RobotState.isAutonomous()) desiredStates = kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(chassisSpeeds, 0.02));
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.MAX_SPEED_MperS);
-    swerveMod[0].setDesiredState(desiredStates[0]);
-    swerveMod[1].setDesiredState(desiredStates[1]);
-    swerveMod[2].setDesiredState(desiredStates[2]);
-    swerveMod[3].setDesiredState(desiredStates[3]);
+    swerveMod[0].setDesiredState(desiredStates[0]);  //FL
+    swerveMod[1].setDesiredState(desiredStates[1]);  //FR
+    swerveMod[2].setDesiredState(desiredStates[2]);  //RL
+    swerveMod[3].setDesiredState(desiredStates[3]);  //RR
   }
 
   public ChassisSpeeds secondOrderKinematics(ChassisSpeeds chassisSpeeds) {
