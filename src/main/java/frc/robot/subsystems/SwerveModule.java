@@ -53,6 +53,8 @@ public class SwerveModule {
 		driveMotor.setOpenLoopRampRate( 0.2 );
 		driveMotor.setSmartCurrentLimit(45, 35);
 
+
+		//Stupid old Rev Config System. Will need to update because they broke it in 2025 - Alex
 		driveVelocityPIDController = driveMotor.getPIDController();
 		driveVelocityPIDController.setP(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][0]);
 		driveVelocityPIDController.setI(Constants.SWERVE_DRIVE_PID_CONSTANTS[swerveModIndex][1]);
@@ -66,7 +68,7 @@ public class SwerveModule {
 		driveEncoder.setVelocityConversionFactor(Constants.DRIVE_VELOCITY_FACTOR);
 		driveEncoder.setAverageDepth(4);
 		driveEncoder.setMeasurementPeriod(16);
-		configureCANStatusFrames(10, 20, 20, 500, 500, 200, 200, driveMotor);
+		configureCANStatusFrames(10, 20, 20, 500, 500, 200, 200, driveMotor); //Magic numbers other teams and YAGSL uses. Makes things happier
 		driveMotor.burnFlash();
 		
 		steerMotor = new CANSparkMax( Constants.SWERVE_STEER_MOTOR_IDS[swerveModIndex], MotorType.kBrushless );
@@ -138,6 +140,9 @@ public class SwerveModule {
 		driveMotor.set(0);
 	} else {
 		double velocity = RobotState.isAutonomous() ? getCosineCompensatedVelocity(state) : state.speedMetersPerSecond;
+		//Applies compensation to prevent unintended sideways motion and reduce slippage when module is not at setpoint position
+		//Does not run during teleop due to it making direction changes far more aggressive and driver will naturally compensate for slight skewing
+		//and drift
         driveVelocityPIDController.setReference(velocity, ControlType.kVelocity);
         	//driveVelocityPIDController.setReference(Constants.MAX_SPEED_MperS, ControlType.kVelocity);
 	}

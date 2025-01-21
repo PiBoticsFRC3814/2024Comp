@@ -41,7 +41,12 @@ public final class Constants {
 
   /*
    * Swerve module motor and encoder ids
+<<<<<<< HEAD
    * { Front Right, Back Right, Back Left, Front Left } -- THIS IS WRONG?
+=======
+   * { Front Right, Back Right, Back Left, Front Left }
+   * Should instead be FL, FR, RL, RR - Alex
+>>>>>>> d92abe620a828572a77cb179a2d09701b9a4cf84
    */
   public static final int[] SWERVE_DRIVE_MOTOR_IDS = {21, 22, 20, 23};//{22, 23, 20, 21}; {21, 22, 20, 23}
   public static final int[] SWERVE_STEER_MOTOR_IDS = {31, 32, 30, 33};//{32, 33, 30, 31}; {31, 32, 30, 33};
@@ -51,6 +56,7 @@ public final class Constants {
 
   public static final double[] SWERVE_SETPOINT_OFFSET = {
     // must be between 0 & 360 degrees
+	  //Do not use. Set offset in Phoenix Tuner X by orienting modules then hit zero - Alex
     0,//88.7, // Front Right
     0,//96.5, // Rear Right
     0,//360.0 - 126.2, // Rear Left
@@ -71,6 +77,7 @@ public final class Constants {
 		{ 0.4, 0.0, 0.2e-2, 0.0, 0.215, -1.0, 1.0 }, //Rear Right
 		{ 0.4, 0.0, 0.2e-2, 0.0, 0.215, -1.0, 1.0 }, //Rear Left
 		{ 0.4, 0.0, 0.2e-2, 0.0, 0.215, -1.0, 1.0 }  //Front Left
+	  //Should be FL, FR, RL, RR but should be able to have all modules with same tune - Alex
 	};
 
   public static final double MAX_DRIVETRAIN_SPEED = 5820;
