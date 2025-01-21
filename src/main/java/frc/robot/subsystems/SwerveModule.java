@@ -140,6 +140,9 @@ public class SwerveModule {
 		driveMotor.set(0);
 	} else {
 		double velocity = RobotState.isAutonomous() ? getCosineCompensatedVelocity(state) : state.speedMetersPerSecond;
+		//Applies compensation to prevent unintended sideways motion and reduce slippage when module is not at setpoint position
+		//Does not run during teleop due to it making direction changes far more aggressive and driver will naturally compensate for slight skewing
+		//and drift
         driveVelocityPIDController.setReference(velocity, ControlType.kVelocity);
         	//driveVelocityPIDController.setReference(Constants.MAX_SPEED_MperS, ControlType.kVelocity);
 	}
